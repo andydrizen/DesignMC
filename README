@@ -1,0 +1,20 @@
+0. Licence
+
+	See licence.txt
+
+1. Installation
+
+	1.1 Requirements
+		
+		You will need GAP as well as the GRAPE and DESIGN packages, and probably a UNIX based environment.
+
+	1.2 
+
+		To initialise the DesignMC Package, put the DesignMC folder in the pkg director of your GAP root and in GAP type:
+
+		gap> LoadPackage("DesignMC");
+
+2. Usage
+
+	2.1 Quick Start
+
