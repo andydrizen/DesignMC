@@ -35,7 +35,7 @@ BindGlobal("FindAllTransversals",function(Design,lambda)
 		    blockSizes:=[3],
 		    tSubsetStructure:=rec(t:=1, lambdas:=[lambda]),
 		    isoLevel:=2,
-			isoGroup:=Group(());
+			isoGroup:=Group(()),
 			ignoreAutGroupComputationForBlockDesign:=true
 		)
 	);
@@ -93,7 +93,7 @@ local i,j,k,transversal,all_transversals,chosen_block,sub_design_blocks,tmp,D2,E
 			# we haven't yet made a full transversal.
 			E:=BlockDesign(D2.v, sub_design_blocks);
 			E.point_set:=ShallowCopy(tmp_point_set);
-			tmp:=PartialTransversals(E,lambda, findAll, depth+1);
+			tmp:=PartialTransversalsBruteForce(E,lambda, findAll, depth+1);
 			for j in tmp do
 				transversal:=[];
 				for k in j do
@@ -147,7 +147,7 @@ BindGlobal("FindAllTransversalsBruteForce",function(input)
 		pfindAll:=false;
 	fi;
 	
-	partials:=PartialTransversals(D2, plambda, pfindAll,1);
+	partials:=PartialTransversalsBruteForce(D2, plambda, pfindAll,1);
 	Print("\n");
 	results:=[];
 	for i in partials do
