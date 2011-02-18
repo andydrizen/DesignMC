@@ -65,7 +65,7 @@ BindGlobal("ProduceLS",function(input)
 		imp:=false;
 	fi;
 	
-	k:=[1,1,1];
+	k:=[3];
 	t:=2;
 	negatives:=[];
 
@@ -181,13 +181,14 @@ BindGlobal("ProduceLS",function(input)
 								requiredAutSubgroup:=requiredAutSubgroup
 								
 						);
+
 	if IsBound(input.isoGroup) then	
 		requirements.isoGroup:=input.isoGroup;
 	fi;
 
 	DL:=BlockDesigns(requirements);
 	for tmp in DL do
-		tmp.k:=k;
+		tmp.k:=[1,1,1];
 		tmp.improper:=imp;
 		tmp.vType:=input.v;
 		tmp.negatives:=Immutable(negatives);
@@ -245,7 +246,7 @@ BindGlobal("ProduceLF",function(input)
 		imp:=false;
 	fi;
 	
-	k:=[2,1];
+	k:=[3];
 	t:=2;
 	negatives:=[];
 	
@@ -352,7 +353,7 @@ BindGlobal("ProduceLF",function(input)
 	DL:=BlockDesigns(requirements);
 
 	for tmp in DL do
-		tmp.k:=k;
+		tmp.k:=[2,1];
 		tmp.vType:=input.v;
 		tmp.improper:=imp;
 	tmp.negatives:=Immutable(negatives);
@@ -466,7 +467,7 @@ BindGlobal("ProduceSTS",function(input)
 
 	DL:=BlockDesigns(requirements);
 	for tmp in DL do
-		tmp.k:=k;
+		tmp.k:=[3];
 		tmp.improper:=imp;
 		tmp.negatives:=Immutable(negatives);
 		tmp.vType:=input.v;
@@ -484,11 +485,11 @@ BindGlobal("Produce2Design",function(input)
 	if input.k = [1,1,1] then
 		return ProduceLS(input);
 	fi;
-	if input.k = [3] then
-		return ProduceSTS(input);
-	fi;
 	if input.k = [2,1] then
 		return ProduceLF(input);
+	fi;
+	if input.k = [3] then
+		return ProduceSTS(input);
 	fi;
 end);
 
