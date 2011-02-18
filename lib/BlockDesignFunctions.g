@@ -109,3 +109,22 @@ BindGlobal("ImproperDesignSpecialBlocks",function(B)
 	od;
 	return help;
 end);
+
+BindGlobal("PrettifyLatinSquare",function(LS)
+	local block, row,col,imp;
+	row:=1;
+	col:=LS.v/3+1;
+	for block in LS.blocks do
+		if not block[1]=row then
+			Print("\n\n");
+			row:=block[1];
+			col:=block[2];
+		fi;
+		if not block[2]=col then
+			Print("\t");
+			col:=block[2];
+		fi;	
+		Print(block[3]-2*LS.v/3,", ");
+	od;
+	Print("\n");
+end);

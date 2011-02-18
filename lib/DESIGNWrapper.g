@@ -1275,7 +1275,7 @@ for kk in KK do
    fi;
    Add(ans,blockdesign);
 od;
-if (IsBound(param.ignoreAutGroupComputationForBlockDesign) and param.isoLevel=0) then
+if (IsBound(param.ignoreAutGroupComputationForBlockDesign) and param.isoLevel=0 and IsBound(ans[1])) then
 	Unbind(ans[1].autSubgroup);
 fi;
 return ans;

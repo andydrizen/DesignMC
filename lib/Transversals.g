@@ -14,31 +14,56 @@
 #
 ################################################################################
 
-BindGlobal("FindTransversal",function(Design,lambda)
-	return BlockDesignsModified(
-		rec(
-		    v:=Design.v, 
-			blockDesign:=Design,
-		    blockSizes:=[3],
-		    tSubsetStructure:=rec(t:=1, lambdas:=[lambda]),
-		    isoLevel:=0,
-			ignoreAutGroupComputationForBlockDesign:=true
-		)
-	);
+BindGlobal("FindTransversal",function(Design,lambda, enhance)
+	if enhance then
+		return BlockDesignsModified(
+			rec(
+			    v:=Design.v, 
+				blockDesign:=Design,
+			    blockSizes:=[3],
+			    tSubsetStructure:=rec(t:=1, lambdas:=[lambda]),
+			    isoLevel:=0,
+				ignoreAutGroupComputationForBlockDesign:=true
+			)
+		);
+	else
+		return BlockDesigns(
+			rec(
+			    v:=Design.v, 
+				blockDesign:=Design,
+			    blockSizes:=[3],
+			    tSubsetStructure:=rec(t:=1, lambdas:=[lambda]),
+			    isoLevel:=0
+			)
+		);
+	fi;
 end);
 
-BindGlobal("FindAllTransversals",function(Design,lambda)
-	return BlockDesignsModified(
-		rec(
-		    v:=Design.v, 
-			blockDesign:=Design,
-		    blockSizes:=[3],
-		    tSubsetStructure:=rec(t:=1, lambdas:=[lambda]),
-		    isoLevel:=2,
-			isoGroup:=Group(()),
-			ignoreAutGroupComputationForBlockDesign:=true
-		)
-	);
+BindGlobal("FindAllTransversals",function(Design,lambda,enhance)
+	if enhance then
+		return BlockDesignsModified(
+			rec(
+			    v:=Design.v, 
+				blockDesign:=Design,
+			    blockSizes:=[3],
+			    tSubsetStructure:=rec(t:=1, lambdas:=[lambda]),
+			    isoLevel:=2,
+				isoGroup:=Group(()),
+				ignoreAutGroupComputationForBlockDesign:=enhance
+			)
+		);
+	else
+		return BlockDesigns(
+			rec(
+			    v:=Design.v, 
+				blockDesign:=Design,
+			    blockSizes:=[3],
+			    tSubsetStructure:=rec(t:=1, lambdas:=[lambda]),
+			    isoLevel:=2,
+				isoGroup:=Group(())
+			)
+		);
+	fi;
 end);
 
 # dependencies: 	GetMutableListList, Sort2, SortListList, DuplicateList, get_blocks_containing_list,
@@ -166,7 +191,7 @@ BindGlobal("FindAllTransversalsBruteForce",function(input)
 	od;
 	Print("Finished Calculation at:",CurrentTime(),"\n");
 	if (pfindAll = false) then
-		return [results2[1]];
+		return results2;
 	fi;
 	
 	return results2;

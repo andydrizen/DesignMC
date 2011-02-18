@@ -8,7 +8,7 @@
 LoadPackage("design");
 
 BindGlobal("MAX_NEGATIVE_BLOCKS", 1);
-BindGlobal("CURRENT_TIME",fail);
+CURRENT_TIME:=fail;
 
 ReadPackage("DesignMC","lib/GenericFunctions.g");
 ReadPackage("DesignMC","lib/BlockDesignFunctions.g");
