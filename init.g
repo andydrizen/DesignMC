@@ -12,8 +12,7 @@ BindGlobal("CURRENT_TIME",fail);
 
 ReadPackage("DesignMC","lib/GenericFunctions.g");
 ReadPackage("DesignMC","lib/BlockDesignFunctions.g");
-ReadPackage("DesignMC","lib/Produce2Designs.g");
-ReadPackage("DesignMC","lib/Aliases.g");
+ReadPackage("DesignMC","lib/DESIGNWrapper.g");
 ReadPackage("DesignMC","lib/MarkovChain.g");
 ReadPackage("DesignMC","lib/Hillclimbing.g");
 ReadPackage("DesignMC","lib/PairGraph.g");
