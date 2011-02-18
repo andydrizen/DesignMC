@@ -4,11 +4,12 @@
 # File overview:
 # 
 # FindTransversal
+# FindAllTransversals
 #
-# PartialTransversals will (in a brute force fashion) try to find all partial 
+# PartialTransversalsBruteForce will (in a brute force fashion) try to find all partial 
 # transversals.
 # 
-# FindAllTransversals will filter PartialTransversals to remove any items
+# FindAllTransversalsBruteForce will filter PartialTransversals to remove any items
 # which are not full transversals.
 #
 ################################################################################
@@ -26,6 +27,20 @@ BindGlobal("FindTransversal",function(Design,lambda)
 	);
 end);
 
+BindGlobal("FindAllTransversals",function(Design,lambda)
+	return BlockDesignsModified(
+		rec(
+		    v:=Design.v, 
+			blockDesign:=Design,
+		    blockSizes:=[3],
+		    tSubsetStructure:=rec(t:=1, lambdas:=[lambda]),
+		    isoLevel:=2,
+			isoGroup:=Group(());
+			ignoreAutGroupComputationForBlockDesign:=true
+		)
+	);
+end);
+
 # dependencies: 	GetMutableListList, Sort2, SortListList, DuplicateList, get_blocks_containing_list,
 #					ShowPercentIndicatorSimple, MultisetDifference
 
@@ -33,7 +48,7 @@ end);
 # Don't know how to do BindGlobal with recursive functions
 #
 
-PartialTransversals:=function( D, lambda, findAll, depth )
+PartialTransversalsBruteForce:=function( D, lambda, findAll, depth )
 local i,j,k,transversal,all_transversals,chosen_block,sub_design_blocks,tmp,D2,E,tmp_point_set,m;
 	D2:=ShallowCopy(D);
 	all_transversals:=[];
@@ -102,7 +117,7 @@ local i,j,k,transversal,all_transversals,chosen_block,sub_design_blocks,tmp,D2,E
 	return Unique(SortListList(all_transversals));
 end;
 
-BindGlobal("FindAllTransversals",function(input)
+BindGlobal("FindAllTransversalsBruteForce",function(input)
 
 	# Finds a set of lambda*n cells, lambda in each row,
 	# lambda in each column and each symbol appears in 

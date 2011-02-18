@@ -27,7 +27,7 @@ BindGlobal("SaveDesigns",function( DesignStructure, path )
 end);
 
 BindGlobal("LoadDesigns",function ( path )
-	return ReadAsFunction(Concatenation(path))();
+	return ReadAsFunction(path)();
 end);
 
 BindGlobal("CreateDatabaseCode",function(e,total_systems)
