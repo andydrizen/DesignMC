@@ -220,7 +220,7 @@ BindGlobal("Hopper",function(B, add, remove)
 	B2.blockNumbers:=[Size(B2.blocks)];
 	B2.isBinary:=IsBinaryBlockDesign(B2);
 	B2.isSimple:=IsSimpleBlockDesign(B2);
-	Unbind(B2.tSubsetStructure);
+	#Unbind(B2.tSubsetStructure);
 	Unbind(B2.autSubgroup);
 	B2.blocks:=SortListList(B2.blocks);
 
