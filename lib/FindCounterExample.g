@@ -13,14 +13,14 @@ FindCounterExample:=function( D, counterExampleWillFailFunction )
 	D2:=ShallowCopy(D);
 
 	numberScanned:=0;
-	while(numberScanned < NumberOfDesignsToScan) do
+	while( true ) do
 		if (D2.improper) then
-			D2:=ManyStepsImproper(D2, NumberOfIntermediateSteps);
+			D2:=ManyStepsImproper(D2, 300);
 		else
-			D2:=ManyStepsProper(D2, NumberOfIntermediateSteps);
+			D2:=ManyStepsProper(D2, 300);
 		fi;
 		numberScanned:=numberScanned+1;
-		if(checkFunction(D2) = false) then
+		if(counterExampleWillFailFunction(D2) = false) then
 			return [D2];
 		fi;
 		ShowProgressIndicator(numberScanned);
