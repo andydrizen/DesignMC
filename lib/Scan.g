@@ -3,11 +3,12 @@
 #                                                                   15/02/2011
 # File overview:
 # 
-# ScanDesigns will help you find designs that do not satisfy the checkFunction
+# FindCounterExample will help you find designs that do not satisfy the 
+# counterExampleWillFailFunction
 #
 ################################################################################
 
-ScanDesigns:=function( D, checkFunction, NumberOfIntermediateSteps, NumberOfDesignsToScan)
+FindCounterExample:=function( D, counterExampleWillFailFunction )
 	local D2, numberScanned;
 	D2:=ShallowCopy(D);
 
@@ -27,10 +28,18 @@ ScanDesigns:=function( D, checkFunction, NumberOfIntermediateSteps, NumberOfDesi
 	return [];
 end;
 
-CTransversal:=function(D)
+HasTransversal:=function(D)
 	if(Size(FindTransversal(D, D.tSubsetStructure.lambdas[1], true))>0) then
 		return true;
 	else
 		return false;
+	fi;
+end;
+
+HasNoTransversal:=function(D)
+	if(Size(FindTransversal(D, D.tSubsetStructure.lambdas[1], true))>0) then
+		return false;
+	else
+		return true;
 	fi;
 end;
