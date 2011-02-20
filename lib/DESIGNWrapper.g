@@ -35,6 +35,7 @@ BindGlobal("QuickLS",function(n)
 	D.k:=[1,1,1];
 	D.improper:=false;
 	D.vType:=[n,n,n];
+	D.tSubsetStructure:=rec(lambdas:=[1,0]);
 	D.negatives:=Immutable([]);
 	return D;
 end);
