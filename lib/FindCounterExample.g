@@ -15,9 +15,9 @@ FindCounterExample:=function( D, counterExampleWillFailFunction )
 	numberScanned:=0;
 	while( true ) do
 		if (D2.improper) then
-			D2:=ManyStepsImproper(D2, 100);
+			D2:=ManyStepsImproper(D2, 1);
 		else
-			D2:=ManyStepsProper(D2, 100);
+			D2:=ManyStepsProper(D2, 1);
 		fi;
 		numberScanned:=numberScanned+1;
 		if(counterExampleWillFailFunction(D2) = false) then
