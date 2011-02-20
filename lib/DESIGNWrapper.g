@@ -18,6 +18,27 @@
 #
 ################################################################################
 
+BindGlobal("QuickLS",function(n)
+	local D,blocks,l,d_blocks,i,j,k;
+	blocks:=[];
+	for i in [1..n] do
+		for j in [1..n] do
+			k:=i+j-1; if k>n then k:=k-n; fi;
+			Add(blocks,[i,j,k]);
+		od;
+	od;
+	d_blocks:=[];
+	for l in blocks do 
+		Add(d_blocks, [l[1],l[2]+n,l[3]+2*n]); 
+	od;
+	D:=BlockDesign(3*n,Set(d_blocks));
+	D.k:=[1,1,1];
+	D.improper:=false;
+	D.vType:=[n,n,n];
+	D.negatives:=Immutable([]);
+	return D;
+end);
+
 BindGlobal("ProduceLS",function(input)
 	#input is a rec. You should, at the very least, include these:
 	
@@ -495,7 +516,11 @@ end);
 
 BindGlobal("LS",function(n,lambdaInt)
 	local results;
-	results:=Produce2Design( rec(v:=[n,n,n], k:=[1,1,1], lambdas:=[lambdaInt,lambdaInt,lambdaInt]) );
+	if lambdaInt = 1 then
+		results:=[QuickLS(n)];
+	else
+		results:=Produce2Design( rec(v:=[n,n,n], k:=[1,1,1], lambdas:=[lambdaInt,lambdaInt,lambdaInt]) );
+	fi;
 	if Size(results)>0 then
 		return results[1];
 	else
