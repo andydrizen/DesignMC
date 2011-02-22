@@ -149,7 +149,6 @@ BindGlobal("FindAllTransversalsBruteForce",function(input)
 	# the cells lambda times.
 
 	local D2,partials,results,i,j,results2,tmp,plambda,pfindAll;
-	Print("Started Calculation at:",CurrentTime(),"\n");
 	if not (IsRecord(input) ) then 
 	   Error("<input> must be a record containing, at the very least, a BlockDesign.");
 	fi;
@@ -173,7 +172,6 @@ BindGlobal("FindAllTransversalsBruteForce",function(input)
 	fi;
 	
 	partials:=PartialTransversalsBruteForce(D2, plambda, pfindAll,1);
-	Print("\n");
 	results:=[];
 	for i in partials do
 		if (Size(i) = D2.v/3 * plambda) then
@@ -189,7 +187,6 @@ BindGlobal("FindAllTransversalsBruteForce",function(input)
 		od;
 		Add(results2, BlockDesign(D2.v,tmp));
 	od;
-	Print("Finished Calculation at:",CurrentTime(),"\n");
 	if (pfindAll = false) then
 		return results2;
 	fi;
