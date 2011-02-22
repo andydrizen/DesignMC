@@ -246,9 +246,10 @@ BindGlobal("ManyStepsProper",function(B, i)
 	local B2, j;
 	B2:=ShallowCopy(B);
 	for j in [1..i] do
-		ShowProgressIndicator(j);
+		#ShowProgressIndicator(j);
 		B2:=OneStep(B2);
 	od;
+	#Print("\n");
 	return B2;
 end);
 
@@ -257,12 +258,13 @@ BindGlobal("ManyStepsImproper",function(B, i)
 
 	B2:=ShallowCopy(B);
 	for j in [1..i] do
-		ShowProgressIndicator(j);
+		#ShowProgressIndicator(j);
 		B2:=Hopper(B2, [], []);
 	od;
 	while B2.improper = false do
 		B2:=Hopper(B2, [], []);
 	od;
+	#Print("\n");
 	return B2;
 end);
 
