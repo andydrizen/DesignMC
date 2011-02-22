@@ -109,22 +109,49 @@ BindGlobal("ImproperDesignSpecialBlocks",function(B)
 	od;
 	return help;
 end);
-
-BindGlobal("PrettifyLatinSquare",function(LS)
-	local block, row,col,imp;
+# a:=LF(4,1);;PrettifyDesign(a);
+BindGlobal("PrettifyDesign",function(LS)
+	local row,col,imp, i, notprinted;
 	row:=1;
-	col:=LS.v/3+1;
-	for block in LS.blocks do
-		if not block[1]=row then
+	if LS.k=[1,1,1] then
+		col:=LS.v/3+1;
+	fi;
+	if LS.k=[2,1] or LS.k=[3] then
+		col:=1;
+	fi;
+	notprinted:=true;
+	for i in [1..Size(LS.blocks)] do
+		
+		if not LS.blocks[i][1]=row then
 			Print("\n\n");
-			row:=block[1];
-			col:=block[2];
+			row:=LS.blocks[i][1];
+			if LS.k=[1,1,1] then
+				col:=LS.v/3+1;
+			fi;
+			if LS.k=[2,1] or LS.k=[3] then
+				col:=1;
+			fi;
+			notprinted:=true;
 		fi;
-		if not block[2]=col then
+
+		while not col = LS.blocks[i][2] do
+			if notprinted = true then
+				Print("x");
+			fi;
 			Print("\t");
-			col:=block[2];
-		fi;	
-		Print(block[3]-2*LS.v/3,", ");
+			col:=col+1;
+		od;			
+
+		if LS.k=[1,1,1] then			
+			Print(LS.blocks[i][3]-2*LS.v/3,", ");
+			notprinted:=false;
+		fi;
+
+		if LS.k=[2,1] or LS.k=[3] then
+			Print(LS.blocks[i][3],", ");
+			notprinted:=false;
+		fi;
+
 	od;
 	Print("\n");
 end);
