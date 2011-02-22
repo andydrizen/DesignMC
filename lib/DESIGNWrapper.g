@@ -227,12 +227,12 @@ BindGlobal("ProduceLF",function(input)
 
 	#input is a rec. You should, at the very least, include these:
 	
-		# "v" (list): 	A tuple of positive integers, e.g. [2,4,6]. This means your square 
-		# 						has 2 Row, 4 Cols, 6 Symbols
+		# "v" (list): 	A tuple of positive integers, e.g. [2,4]. This means your square 
+		# 						has 2 nodes, 4 Colours
 		
 	# optional extras:
 	
-		#lambdas (list): 	A tuple of positive integers for the lambda values VV, VC
+		#lambdas (list): 	A tuple of positive integers for the lambda values NN, NC
 		#						(in that order) e.g. [1,1].
 		
 		# isoLevel (int): as in DESIGN.

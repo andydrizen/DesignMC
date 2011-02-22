@@ -22,3 +22,5 @@ ReadPackage("DesignMC","lib/CompleteLatinSquares.g");
 ReadPackage("DesignMC","lib/Transversals.g");
 ReadPackage("DesignMC","lib/Misc.g");
 ReadPackage("DesignMC","lib/FindCounterExample.g");
+ReadPackage("DesignMC","lib/SurveyDesigns.g");
+
