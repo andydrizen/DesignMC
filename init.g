@@ -24,3 +24,4 @@ ReadPackage("DesignMC","lib/Misc.g");
 ReadPackage("DesignMC","lib/FindCounterExample.g");
 ReadPackage("DesignMC","lib/SurveyDesigns.g");
 ReadPackage("DesignMC","lib/Genetic.g");
+ReadPackage("DesignMC","lib/json.g");
