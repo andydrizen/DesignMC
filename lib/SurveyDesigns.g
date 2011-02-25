@@ -31,42 +31,16 @@ SurveyDesigns:=function( D, experiments, mixingTime, path )
 	return [];
 end;
 
-FindAllSubSquares:=function(D, subsquareSize)
-	local rowsInSubSquare, colsInSubSquare, i, j, k,l, blocks,symbols, results, B;
-	results:=[];
-	for i in Combinations([1..D.vType[1]],subsquareSize) do
-		rowsInSubSquare:=i;
-		for j in Combinations([D.vType[1]+1..2*D.vType[1]],subsquareSize) do
-			colsInSubSquare:=j;
-			blocks:=[];
-			symbols:=[];
-			for k in Cartesian(rowsInSubSquare,colsInSubSquare) do
-				for l in get_blocks_containing_list(D, k) do
-					Add(symbols, l[3]);
-					Add(blocks, l);
-				od;
-			od;
-			if Size(Set(symbols)) = subsquareSize then
-				B:=BlockDesign(D.v, blocks);
-				B.k:=[1,1,1];
-				B.improper:=D.improper;
-				Add(results,B);
-			fi;
-		od;
-	od;
-	return results;
-end;
-
 HasIntercalates:=function(D)
 	local intercalates;
-	intercalates:=FindAllSubSquares(D, 2);
+	intercalates:=FindAllSubSquaresOfSize(D, 2);
 	return intercalates;
 end;
 
 HasNoSubsquares:=function(D)
 	local i,res;
 	for i in [2..D.v/6] do
-		res:=FindAllSubSquares(D, i);
+		res:=FindAllSubSquaresOfSize(D, i);
 		return res;
 	od;
 	return [];

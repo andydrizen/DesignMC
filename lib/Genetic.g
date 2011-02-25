@@ -1,4 +1,13 @@
-CreatePopulation:=function(D, population_size)
+################################################################################
+# DesignMC/lib/Genetic.g                                        Andy L. Drizen
+#                                                                   15/02/2011
+# File overview:
+# 
+# BeginEvolution on a design D for a property that you want o optimise.
+#
+################################################################################
+
+BindGlobal("CreatePopulation",function(D, population_size)
 	local population,i;
 	population:=[];
 	for i in [1..population_size] do
@@ -6,9 +15,9 @@ CreatePopulation:=function(D, population_size)
 		Add(population, ManyStepsProper(D, 10));
 	od;
 	return population;
-end;
+end);
 
-JudgePopulation:=function(population, criterion)
+BindGlobal("JudgePopulation",function(population, criterion)
 	local winners, assessment,i;
 	winners:=[];
 	assessment:=[];
@@ -21,22 +30,22 @@ JudgePopulation:=function(population, criterion)
 		Add(winners, assessment[i]);
 	od;
 	return winners;
-end;
+end);
 
-MutateCitizen:=function(citizen)
+BindGlobal("MutateCitizen",function(citizen)
 	#if Random([0,1]) = 0 then
 		citizen:=ManyStepsProper(citizen, 1);
 	#fi;
 	return citizen;
-end;
+end);
 
-MateCitizens:=function(mother, father)
+BindGlobal("MateCitizens",function(mother, father)
 	local child;
 	child:=ShallowCopy(mother[2]);
 	return child;
-end;
+end);
 
-BreedNewPopulationFromWinners:=function(population_size, winners)
+BindGlobal("BreedNewPopulationFromWinners",function(population_size, winners)
 	local population, mother, father, child;
 	population:=[];
 	while Size(population)<population_size do
@@ -47,9 +56,9 @@ BreedNewPopulationFromWinners:=function(population_size, winners)
 		Add(population, child);
 	od;
 	return population;
-end;
+end);
 
-BeginEvolution:=function(D, population_size, criterion_to_optimise)
+BindGlobal("BeginEvolution",function(D, population_size, criterion_to_optimise)
 	local population, winners, best_so_far;
 	best_so_far:=rec(design:=[], criterion_value:=0);
 	Print("Spawning intial population...");
@@ -66,8 +75,11 @@ BeginEvolution:=function(D, population_size, criterion_to_optimise)
 		fi;
 		population:=BreedNewPopulationFromWinners(population_size, winners);
 	od;
-end;
+end);
 
 BindGlobal("NumTransversals",function(Design)
 	return Size(FindAllTransversals(Design, 1, true));
+end);
+BindGlobal("NumIntercalates",function(Design)
+	return Size(FindAllSubsquaresOfSize(Design, 2));
 end);
