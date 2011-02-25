@@ -56,11 +56,22 @@ FindAllSubSquares:=function(D, subsquareSize)
 	od;
 	return results;
 end;
+
 HasIntercalates:=function(D)
 	local intercalates;
 	intercalates:=FindAllSubSquares(D, 2);
 	return intercalates;
 end;
+
+HasNoSubsquares:=function(D)
+	local i,res;
+	for i in [2..D.v/6] do
+		res:=FindAllSubSquares(D, i);
+		return res;
+	od;
+	return [];
+end;
+
 HasTransversals:=function(D)
 	local transversals;
 	transversals:=FindAllTransversals(D, D.tSubsetStructure.lambdas[1], true);
