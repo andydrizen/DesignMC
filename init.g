@@ -19,7 +19,7 @@ ReadPackage("DesignMC","lib/PairGraph.g");
 ReadPackage("DesignMC","lib/Database.g");
 ReadPackage("DesignMC","lib/Sudoku.g");
 ReadPackage("DesignMC","lib/CompleteLatinSquares.g");
-ReadPackage("DesignMC","lib/Transversals.g");
+ReadPackage("DesignMC","lib/LatinSquareAnalysis.g");
 ReadPackage("DesignMC","lib/Misc.g");
 ReadPackage("DesignMC","lib/FindCounterExample.g");
 ReadPackage("DesignMC","lib/SurveyDesigns.g");

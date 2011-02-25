@@ -81,5 +81,5 @@ BindGlobal("NumTransversals",function(Design)
 	return Size(FindAllTransversals(Design, 1, true));
 end);
 BindGlobal("NumIntercalates",function(Design)
-	return Size(FindAllSubsquaresOfSize(Design, 2));
+	return Size(FindAllSubSquaresOfSize(Design, 2));
 end);
