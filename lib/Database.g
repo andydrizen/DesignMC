@@ -41,10 +41,10 @@ JSONStringifyListOfSameDesignType:=function( inputList, path )
 	for i in inputList do
 		AppendTo(out, "\t");
 		AppendTo(out, ReplacedString(CreateJSONStringFromRecord(i),"\n",""));
-		j:=j+1;
 		if j < Size(inputList) then
 			AppendTo(out, ",\n");
 		fi;
+		j:=j+1;
 	od;
 	
 	AppendTo(out, "]}\n");
