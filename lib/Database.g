@@ -20,7 +20,7 @@
 ################################################################################
 
 JSONStringifyListOfSameDesignType:=function( inputList, path )
-	local i,out,total_number;
+	local i,out,total_number,j;
 	out:=OutputTextFile(path, false);
 	SetPrintFormattingStatus(out, false);
 	total_number:=TotalNumberOfSystems(inputList);
@@ -37,10 +37,14 @@ JSONStringifyListOfSameDesignType:=function( inputList, path )
 	\n\"tags\":[], \
 	\n\"enumeration\":[\n"); 
 	
+	j:=1;
 	for i in inputList do
 		AppendTo(out, "\t");
-		AppendTo(out, CreateJSONStringFromRecord(i));
-		AppendTo(out, ",\n");
+		AppendTo(out, ReplacedString(CreateJSONStringFromRecord(i),"\n",""));
+		j:=j+1;
+		if j < Size(inputList) then
+			AppendTo(out, ",\n");
+		fi;
 	od;
 	
 	AppendTo(out, "]}\n");
