@@ -19,6 +19,33 @@
 #
 ################################################################################
 
+JSONStringifyListOfSameDesignType:=function( inputList, path )
+	local i,out,total_number;
+	out:=OutputTextFile(path, false);
+	SetPrintFormattingStatus(out, false);
+	total_number:=TotalNumberOfSystems(inputList);
+	PrintTo(out, 
+	"{\"t\":",inputList[1].tSubsetStructure.t,", \
+	\n\"vType\":",inputList[1].vType,", \
+	\n\"k\":",inputList[1].k,", \
+	\n\"l\":",inputList[1].tSubsetStructure.lambdas,", \
+	\n\"b\":",inputList[1].blockNumbers,", \
+	\n\"negatives\":",Size(inputList[1].negatives),", \
+	\n\"number_up_to_isomorphism\":",Size(inputList),", \
+	\n\"total_number\":",total_number,", \
+	\n\"notes\":[], \
+	\n\"tags\":[], \
+	\n\"enumeration\":[\n"); 
+	
+	for i in inputList do
+		AppendTo(out, "\t");
+		AppendTo(out, CreateJSONStringFromRecord(i));
+		AppendTo(out, ",\n");
+	od;
+	
+	AppendTo(out, "]}\n");
+end;
+
 BindGlobal("SaveDesigns",function( DesignStructure, path )
 	PrintTo(path, "return ");
 	AppendTo(path, Produce2Design( DesignStructure ) );

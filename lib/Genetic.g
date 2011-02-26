@@ -1,6 +1,6 @@
 ################################################################################
 # DesignMC/lib/Genetic.g                                        Andy L. Drizen
-#                                                                   15/02/2011
+#                                                                   25/02/2011
 # File overview:
 # 
 # BeginEvolution on a design D for a property that you want o optimise.

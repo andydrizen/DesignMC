@@ -6,10 +6,13 @@
 
 
 LoadPackage("design");
+LoadPackage("JSON");
 
 BindGlobal("MAX_NEGATIVE_BLOCKS", 1);
 CURRENT_TIME:=fail;
 
+ReadPackage("DesignMC","lib/StringFunctions.g");
+ReadPackage("DesignMC","lib/JSON.g");
 ReadPackage("DesignMC","lib/GenericFunctions.g");
 ReadPackage("DesignMC","lib/BlockDesignFunctions.g");
 ReadPackage("DesignMC","lib/DESIGNWrapper.g");
@@ -24,4 +27,3 @@ ReadPackage("DesignMC","lib/Misc.g");
 ReadPackage("DesignMC","lib/FindCounterExample.g");
 ReadPackage("DesignMC","lib/SurveyDesigns.g");
 ReadPackage("DesignMC","lib/Genetic.g");
-ReadPackage("DesignMC","lib/json.g");
