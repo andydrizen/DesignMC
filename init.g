@@ -6,7 +6,7 @@
 
 
 LoadPackage("design");
-LoadPackage("JSON");
+LoadPackage("JSONGAP");
 
 BindGlobal("MAX_NEGATIVE_BLOCKS", 1);
 CURRENT_TIME:=fail;
