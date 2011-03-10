@@ -20,7 +20,7 @@
 ################################################################################
 
 JSONStringifyListOfSameDesignType:=function( inputList, path )
-	local i,out,total_number,j;
+	local i,out,total_number,j,tmp,i2;
 	out:=OutputTextFile(path, false);
 	SetPrintFormattingStatus(out, false);
 	total_number:=TotalNumberOfSystems(inputList);
@@ -38,8 +38,12 @@ JSONStringifyListOfSameDesignType:=function( inputList, path )
 	\n\"enumeration\":[\n"); 
 	
 	j:=1;
-	for i in inputList do
+	for i2 in inputList do
+		i:=ShallowCopy(i2);
 		AppendTo(out, "\t");
+		tmp:=i.tSubsetStructure.t;
+		Unbind(i.tSubsetStructure);
+		i.tSubsetStructure:=rec(t:=tmp);
 		AppendTo(out, ReplacedString(CreateJSONStringFromRecord(i),"\n",""));
 		if j < Size(inputList) then
 			AppendTo(out, ",\n");

@@ -58,15 +58,20 @@ BindGlobal("BreedNewPopulationFromWinners",function(population_size, winners)
 	return population;
 end);
 
-BindGlobal("BeginEvolution",function(D, population_size, criterion_to_optimise)
-	local population, winners, best_so_far;
-	best_so_far:=rec(design:=[], criterion_value:=0);
+BindGlobal("BeginEvolution",function(D, population_size, criterion_to_optimise, ShouldMaximise)
+	local population, winners, best_so_far,k;
+	if ShouldMaximise then
+		k:=0;
+	else
+		k:=99999999999;
+	fi;
+	best_so_far:=rec(design:=[], criterion_value:=k);
 	Print("Spawning intial population...");
 	population:=CreatePopulation(D, population_size);
 	Print("\n..done!\n");
 	while true do
 		winners:=JudgePopulation(population, criterion_to_optimise);
-		if winners[1][1] > best_so_far.criterion_value then
+		if (ShouldMaximise and winners[1][1] > best_so_far.criterion_value) or ((not ShouldMaximise) and winners[1][1] < best_so_far.criterion_value) then
 			Print("We've found a new best citizen!\n",winners[1][2],"\n\nCriterion Value: ",winners[1][1],"\n---------------------\n\n");
 			best_so_far.criterion_value:=winners[1][1];
 			best_so_far.design:=ShallowCopy(winners[1][2]);
