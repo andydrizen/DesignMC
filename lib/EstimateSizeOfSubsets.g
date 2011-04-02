@@ -17,7 +17,7 @@ GetRandomSample:=function(D, mixingTime, sampleSize)
 	return results;
 end;
 
-# k:=[];; for m in z do Add(k,NumTransversals(m)); od;k;
+# k:=[];; for m in q do Add(k,NumTransversals(m)); od;k;
 
 # a:=0;;for i in k do if i <= 20 then a:=a+1; fi; od;a;
 

@@ -14,6 +14,31 @@
 #
 ################################################################################
 
+BindGlobal("FindTransversal2",function(Design,lambda, enhance)
+	if enhance then
+		return BlockDesignsModified(
+			rec(
+			    v:=Design.v, 
+				blockDesign:=Design,
+			    blockSizes:=[3],
+			    tSubsetStructure:=rec(t:=1, lambdas:=[lambda]),
+			    isoLevel:=0,
+				isoGroup:=Group(())
+			)
+		);
+	else
+		return BlockDesigns(
+			rec(
+			    v:=Design.v, 
+				blockDesign:=Design,
+			    blockSizes:=[3],
+			    tSubsetStructure:=rec(t:=1, lambdas:=[lambda]),
+			    isoLevel:=0
+			)
+		);
+	fi;
+end);
+
 BindGlobal("FindTransversal",function(Design,lambda, enhance)
 	if enhance then
 		return BlockDesignsModified(
@@ -193,6 +218,35 @@ BindGlobal("FindAllTransversalsBruteForce",function(input)
 	
 	return results2;
 end);
+
+FindAllSubSquaresOfSizeImproved:=function(D, subsquareSize)
+	local rowsInSubSquare, colsInSubSquare, i, j, k,l,m, blocks,symbols, results, B;
+	results:=[];
+	for i in Combinations([1..D.vType[1]],subsquareSize) do
+		rowsInSubSquare:=i;
+		for j in Combinations([D.vType[1]+1..2*D.vType[1]],subsquareSize) do
+			colsInSubSquare:=j;
+			blocks:=[];
+			symbols:=[];
+			for k in Cartesian(rowsInSubSquare,colsInSubSquare) do
+				for l in get_blocks_containing_list(D, k) do
+					Add(symbols, l[3]);
+					Add(blocks, l);
+				od;
+
+				for m in Combinations(blocks, subsquareSize*subsquareSize) do
+					if Size(Unique(Flat(m))) = subsquareSize*3 then
+						B:=BlockDesign(D.v, m);
+						B.k:=[1,1,1];
+						B.improper:=D.improper;
+						Add(results,B);
+					fi;
+				od;
+			od;
+		od;
+	od;
+	return results;
+end;
 
 BindGlobal("FindAllSubSquaresOfSize",function(D, subsquareSize)
 	local rowsInSubSquare, colsInSubSquare, i, j, k,l, blocks,symbols, results, B;
