@@ -178,7 +178,7 @@ class Square
 			}
 		}
 
-		/* Getters */
+		/* Setters */
 		void setPath( const char* path )
 		{
 			this->path = path;
