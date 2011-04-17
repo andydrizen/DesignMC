@@ -155,3 +155,41 @@ BindGlobal("PrettifyDesign",function(LS)
 	od;
 	Print("\n");
 end);
+BindGlobal("ExportLSToMaple",function(LS)
+	local row,col,imp, i, notprinted;
+	row:=1;
+	if LS.k=[1,1,1] then
+		col:=LS.v/3+1;
+	fi;
+	if LS.k=[2,1] or LS.k=[3] then
+		col:=1;
+	fi;
+	notprinted:=true;
+	Print("Matrix([\n[");
+	for i in [1..Size(LS.blocks)] do
+		
+		if not LS.blocks[i][1]=row then
+			Print("\b\b],\n[");
+			row:=LS.blocks[i][1];
+			if LS.k=[1,1,1] then
+				col:=LS.v/3+1;
+			fi;
+
+			notprinted:=true;
+		fi;
+
+		while not col = LS.blocks[i][2] do
+			if notprinted = true then
+				Print("x");
+			fi;
+			col:=col+1;
+		od;			
+
+		if LS.k=[1,1,1] then			
+			Print("x[",LS.blocks[i][3]-2*LS.v/3,"], ");
+			notprinted:=false;
+		fi;
+
+	od;
+	Print("\b\b]]):\n");
+end);

@@ -273,3 +273,17 @@ BindGlobal("FindAllSubSquaresOfSize",function(D, subsquareSize)
 	od;
 	return results;
 end);
+
+findSquareWithLessThanKTransversals:=function(n, k)
+	local q,m;
+	q:=LS(n,1);;
+	while true do 
+		q:=ManyStepsProper(q,10);; 
+		m:=Size(FindAllTransversals(q, 1, true)); 
+		Print(m, " \c"); 
+		if(m < k) then 
+			Print("\n\n",q,"\n"); 
+			break; 
+		fi; 
+	od;
+end;
