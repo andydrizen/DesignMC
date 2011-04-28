@@ -7,12 +7,27 @@
 ################################################################################
 
 GetRandomSample:=function(D, mixingTime, sampleSize)
-	local i,results;
+	local i,results,m;
 	i:=1;
+	m:=ShallowCopy(D);
 	results:=[];
 	for i in [1..sampleSize] do
 		ShowProgressIndicator(i);
-		Add(results, ManyStepsProper(D, mixingTime));
+		m:=ManyStepsProper(D, mixingTime);
+		Add(results, m);
+	od;
+	return results;
+end;
+
+GetRandomHopSample:=function(D,sampleSize)
+	local i,results,m;
+	i:=1;
+	m:=ShallowCopy(D);
+	results:=[];
+	for i in [1..sampleSize] do
+		ShowProgressIndicator(i);
+		m:=Hopper(m, [],[]);
+		Add(results, m);
 	od;
 	return results;
 end;
