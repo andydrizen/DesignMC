@@ -81,10 +81,3 @@ BindGlobal("BeginEvolution",function(D, population_size, criterion_to_optimise, 
 		population:=BreedNewPopulationFromWinners(population_size, winners);
 	od;
 end);
-
-BindGlobal("NumTransversals",function(Design)
-	return Size(FindAllTransversals(Design, 1, true));
-end);
-BindGlobal("NumIntercalates",function(Design)
-	return Size(FindAllSubSquaresOfSize(Design, 2));
-end);

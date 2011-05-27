@@ -365,9 +365,9 @@ class Square
 				if(IsTransversal(diagonal))
 					trans++;
 				//if(total % 1000 == 0)
-					
+				cout << trans<<" / "<<total <<" diagonals have been transversals (average = " << (double) factorial(vType[0])*(float)trans/total << ")\n";	
 			}
-			cout << trans<<" / "<<total <<" diagonals have been transversals (average = " << (double) factorial(vType[0])*(float)trans/total << ")\n";
+			//cout << trans<<" / "<<total <<" diagonals have been transversals (average = " << (double) factorial(vType[0])*(float)trans/total << ")\n";
 			
 		}
 		
@@ -402,7 +402,7 @@ class Square
 		{
 			vector<blockSet> foundTrans;
 			int i=0;
-			while(i < 50000)
+			while(i < 500000)
 			{
 				i++;
 				blockSet newTrans = findTransversal();
@@ -422,14 +422,14 @@ class Square
 int main(int argc, char *argv[])
 {
 	srand ( time(NULL) );
-	Square* mySquare = new Square(12);
-	mySquare->manyStepsProper(20);
+	Square* mySquare = new Square(15);
+	//mySquare->manyStepsProper(0);
 	//mySquare->prettify();
-	mySquare->display();
+	//mySquare->display();
 	//mySquare->sampleDiagonalSpace();
-	cout << "Transversal: " << mySquare->stringifyBlocks(mySquare->findTransversal());
+	//cout << "Transversal: " << mySquare->stringifyBlocks(mySquare->findTransversal());
 	//mySquare->findAllTransversals();
-	/*
+	
 	
 	// Sample
 	if(argc<6)
@@ -518,6 +518,6 @@ int main(int argc, char *argv[])
 
 		writer.close();
 	}
-	*/
+	
 	return 0;
 }

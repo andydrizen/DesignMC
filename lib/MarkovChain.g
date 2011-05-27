@@ -220,7 +220,7 @@ BindGlobal("Hopper",function(B, add, remove)
 	Unbind(B2.autGroup);
 	B2.blockNumbers:=[Size(B2.blocks)];
 	B2.isBinary:=IsBinaryBlockDesign(B2);
-	B2.tSubsetStructure.t:=2;
+	#B2.tSubsetStructure.t:=2;
 	B2.isSimple:=IsSimpleBlockDesign(B2);
 	#Unbind(B2.tSubsetStructure);
 	Unbind(B2.autSubgroup);
@@ -295,98 +295,3 @@ BindGlobal("RandomWalkOnMarkovChain",function(B, improper)
 		ShowProgressIndicator(i);
 	od;
 end);
-
-GetIndexOfElementInList:=function(element, list)
-	local i;
-	for i in [1..Size(list)] do
-		if list[i] = element then
-			return i;
-		fi;
-	od;
-	return -1;
-end;
-
-GetIndexOfIsomorphicElementInList:=function(element, list)
-	local i;
-	for i in [1..Size(list)] do
-		if IsIsomorphicBlockDesign(list[i], element) then
-			return i;
-		fi;
-	od;
-	return -1;
-end;
-
-UniqueBlockDesigns:=function(squares)
-	local i,j,new,flag;
-	new:=[];
-	for i in [1..Size(squares)] do
-		flag:=0;
-		for j in [i+1..Size(squares)] do
-			if IsEqualBlockDesign(squares[i],squares[j]) then
-				flag:=1;
-				break;
-			fi;
-		od;
-		if flag = 0 then
-			Add(new, squares[i]);
-		fi;
-	od;
-	return new;
-end;
-
-TransitionMatrix:=function(squares)
-	local transition_matrix, i,j, imp_moves, new_square, move,index, prop_moves,sum;
-
-	transition_matrix:=[];
-
-	# zero the transition_matrix
-
-	for i in [1..Size(squares)] do
-		Add(transition_matrix, DuplicateList([0], Size(squares)));
-	od;
-
-	for i in [1..Size(squares)] do
-		if Size(squares[i].negatives)>0 then
-		
-			# get all 8 possible moves, and then try them all.
-			imp_moves:=RemovableBlocks(squares[i], squares[i].negatives[1]);
-			for move in imp_moves do
-				new_square:=Hopper(squares[i], squares[i].negatives[1],move);
-			
-				# now we've got a square, find it in the kth position of the squares array
-				# and then add 1 to the (i,k)th entry in the transition matrix.
-				
-				#index:=GetIndexOfElementInList(new_square, squares);
-				index:=GetIndexOfIsomorphicElementInList(new_square, squares);
-				transition_matrix[i][index]:=transition_matrix[i][index]+1;
-				
-			od;
-		
-		else
-		
-			prop_moves:=Cartesian([1..squares[i].vType[1]], [squares[i].vType[1]+1..squares[i].vType[1]+squares[i].vType[2]], [squares[i].vType[1]+squares[i].vType[2]+1..squares[i].vType[1]+squares[i].vType[2]+squares[i].vType[3]]);
-			
-			for move in prop_moves do
-				new_square:=Hopper(squares[i], move,[]);
-				
-				#index:=GetIndexOfElementInList(new_square, squares);
-				index:=GetIndexOfIsomorphicElementInList(new_square, squares);
-				transition_matrix[i][index]:=transition_matrix[i][index]+1;
-			od;
-		fi;
-	od;
-	
-	for i in [1..Size(transition_matrix)] do
-		sum:=Sum(transition_matrix[i]);
-		for j in [1..Size(transition_matrix[i])] do
-			transition_matrix[i][j]:=transition_matrix[i][j]/sum;
-		od;
-	od;
-	PrintTo("~/Desktop/matrix.txt",transition_matrix);
-	return transition_matrix;
-end;
-
-#s:=GetRandomHopSample(LS(5,1), 1000);;d:=UniqueBlockDesigns(s);;Print("\n");Size(d);
-#f:=BlockDesignIsomorphismClassRepresentatives(d);
-#t:=TransitionMatrix(f);
-

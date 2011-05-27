@@ -14,82 +14,32 @@
 #
 ################################################################################
 
-BindGlobal("FindTransversal2",function(Design,lambda, enhance)
-	if enhance then
-		return BlockDesignsModified(
-			rec(
-			    v:=Design.v, 
-				blockDesign:=Design,
-			    blockSizes:=[3],
-			    tSubsetStructure:=rec(t:=1, lambdas:=[lambda]),
-			    isoLevel:=0,
-				isoGroup:=Group(())
-			)
-		);
-	else
-		return BlockDesigns(
-			rec(
-			    v:=Design.v, 
-				blockDesign:=Design,
-			    blockSizes:=[3],
-			    tSubsetStructure:=rec(t:=1, lambdas:=[lambda]),
-			    isoLevel:=0
-			)
-		);
-	fi;
+BindGlobal("FindTransversal",function(Design,lambda)
+	return BlockDesigns(
+		rec(
+		    v:=Design.v, 
+			blockDesign:=Design,
+		    blockSizes:=[3],
+		    tSubsetStructure:=rec(t:=1, lambdas:=[lambda]),
+		    isoLevel:=0,
+			isoGroup:=Group(())
+		)
+	);
 end);
 
-BindGlobal("FindTransversal",function(Design,lambda, enhance)
-	if enhance then
-		return BlockDesignsModified(
-			rec(
-			    v:=Design.v, 
-				blockDesign:=Design,
-			    blockSizes:=[3],
-			    tSubsetStructure:=rec(t:=1, lambdas:=[lambda]),
-			    isoLevel:=0,
-				ignoreAutGroupComputationForBlockDesign:=true
-			)
-		);
-	else
-		return BlockDesigns(
-			rec(
-			    v:=Design.v, 
-				blockDesign:=Design,
-			    blockSizes:=[3],
-			    tSubsetStructure:=rec(t:=1, lambdas:=[lambda]),
-			    isoLevel:=0
-			)
-		);
-	fi;
+BindGlobal("FindAllTransversals",function(Design,lambda)
+	return BlockDesigns(
+		rec(
+		    v:=Design.v, 
+			blockDesign:=Design,
+		    blockSizes:=[3],
+		    tSubsetStructure:=rec(t:=1, lambdas:=[lambda]),
+		    isoLevel:=2,
+			isoGroup:=Group(()),
+		)
+	);
 end);
 
-BindGlobal("FindAllTransversals",function(Design,lambda,enhance)
-	if enhance then
-		return BlockDesignsModified(
-			rec(
-			    v:=Design.v, 
-				blockDesign:=Design,
-			    blockSizes:=[3],
-			    tSubsetStructure:=rec(t:=1, lambdas:=[lambda]),
-			    isoLevel:=2,
-				isoGroup:=Group(()),
-				ignoreAutGroupComputationForBlockDesign:=enhance
-			)
-		);
-	else
-		return BlockDesigns(
-			rec(
-			    v:=Design.v, 
-				blockDesign:=Design,
-			    blockSizes:=[3],
-			    tSubsetStructure:=rec(t:=1, lambdas:=[lambda]),
-			    isoLevel:=2,
-				isoGroup:=Group(())
-			)
-		);
-	fi;
-end);
 
 # dependencies: 	GetMutableListList, Sort2, SortListList, DuplicateList, get_blocks_containing_list,
 #					ShowPercentIndicatorSimple, MultisetDifference
@@ -273,6 +223,12 @@ BindGlobal("FindAllSubSquaresOfSize",function(D, subsquareSize)
 	od;
 	return results;
 end);
+BindGlobal("NumTransversals",function(Design)
+	return Size(FindAllTransversals(Design, 1, true));
+end);
+BindGlobal("NumIntercalates",function(Design)
+	return Size(FindAllSubSquaresOfSize(Design, 2));
+end);
 
 findSquareWithLessThanKTransversals:=function(n, k)
 	local q,m;
@@ -287,3 +243,571 @@ findSquareWithLessThanKTransversals:=function(n, k)
 		fi; 
 	od;
 end;
+
+GetIndexOfElementInList:=function(element, list)
+	local i;
+	for i in [1..Size(list)] do
+		if list[i] = element then
+			return i;
+		fi;
+	od;
+	return -1;
+end;
+
+GetIndexOfIsomorphicElementInList:=function(element, list)
+	local i;
+	for i in [1..Size(list)] do
+		if IsIsomorphicBlockDesign(list[i], element) then
+			return i;
+		fi;
+	od;
+	return -1;
+end;
+
+UniqueBlockDesigns:=function(squares)
+	local i,j,new,flag;
+	new:=[];
+	for i in [1..Size(squares)] do
+		flag:=0;
+		for j in [i+1..Size(squares)] do
+			if IsEqualBlockDesign(squares[i],squares[j]) then
+				flag:=1;
+				break;
+			fi;
+		od;
+		if flag = 0 then
+			Add(new, squares[i]);
+		fi;
+	od;
+	return new;
+end;
+
+TransitionMatrix:=function(squares)
+	local transition_matrix, i,j, new_square, prop_moves, imp_moves,index,sum;
+
+	transition_matrix:=[];
+
+	# zero the transition_matrix
+
+	for i in [1..Size(squares)] do
+		Add(transition_matrix, DuplicateList([0], Size(squares)));
+	od;
+	
+	# only compute the proper moves once.
+	prop_moves:=Cartesian([1..squares[i].vType[1]], [squares[i].vType[1]+1..squares[i].vType[1]+squares[i].vType[2]], [squares[i].vType[1]+squares[i].vType[2]+1..squares[i].vType[1]+squares[i].vType[2]+squares[i].vType[3]]);
+
+	for i in [1..Size(squares)] do
+		ShowProgressIndicator(i);
+		if Size(squares[i].negatives)>0 then
+			# get all 8 possible moves, and then try them all.
+			imp_moves:=RemovableBlocks(squares[i], squares[i].negatives[1]);
+			for j in [1..Size(imp_moves)] do
+				new_square:=Hopper(squares[i], squares[i].negatives[1],imp_moves[j]);
+			
+				# now we've got a square, find it in the kth position of the squares array
+				# and then add 1 to the (i,k)th entry in the transition matrix.
+				
+				#index:=GetIndexOfElementInList(new_square, squares);
+				index:=GetIndexOfIsomorphicElementInList(new_square, squares);
+				transition_matrix[i][index]:=transition_matrix[i][index]+1;
+				
+			od;
+		
+		else
+			for j in [1..Size(prop_moves)] do
+				new_square:=Hopper(squares[i], prop_moves[j],[]);
+				
+				#index:=GetIndexOfElementInList(new_square, squares);
+				index:=GetIndexOfIsomorphicElementInList(new_square, squares);
+				transition_matrix[i][index]:=transition_matrix[i][index]+1;
+			od;
+		fi;
+	od;
+	
+	for i in [1..Size(transition_matrix)] do
+		sum:=Sum(transition_matrix[i]);
+		for j in [1..Size(transition_matrix[i])] do
+			transition_matrix[i][j]:=transition_matrix[i][j]/sum;
+		od;
+	od;
+	PrintTo("~/Desktop/matrix.txt",transition_matrix);
+	return transition_matrix;
+end;
+
+FindSquareWithLeastTransversals:=function(m)
+	local prop_moves, imp_moves,new_square, potentials,tmp,m2,best,j,flag;
+	m2:=ShallowCopy(m);
+	Print("Intialising...");
+	prop_moves:=Cartesian([1..m2.vType[1]], [m2.vType[1]+1..m2.vType[1]+m2.vType[2]], [m2.vType[1]+m2.vType[2]+1..m2.vType[1]+m2.vType[2]+m2.vType[3]]);
+	Print("Done!\n");
+	best:=99999999;
+	while(best>0) do
+		potentials:=[];
+		if Size(m2.negatives)>0 then
+			# get all 8 possible moves, and then try them all.
+			imp_moves:=RemovableBlocks(m2, m2.negatives[1]);
+			for j in [1..Size(imp_moves)] do
+				tmp:=Hopper(m2, m2.negatives[1],imp_moves[j]);
+				Add(potentials,[tmp,NumTransversals(tmp)]);
+			od;
+		else
+			for j in [1..Size(prop_moves)] do
+				tmp:=Hopper(m2, prop_moves[j],[]);
+				Add(potentials,[tmp,NumTransversals(tmp)]);
+			od;
+		fi;
+		flag:=0;
+		for tmp in potentials do
+			if tmp[2] < best then
+				flag:=1;
+				best:=tmp[2];
+				m2:=tmp[1];
+				Print("New best: ",m2,"\n\n---NumTransversals: ",best,"---\n");
+			fi;
+		od;
+		if flag = 0 then
+			Print("Found local minima; jumping.");
+			m2:=ManyStepsProper(m2, 10);
+		fi;
+	od;
+end;
+
+FindMaximallyIntersectingDistinctTransversals:=function(D)
+	local transversals, i, j, best_match,r;
+	best_match:=rec(t1:=0, t2:=0, difference:=0);
+	transversals:=FindAllTransversals(D, 1);
+	if Size(transversals) = 0 then
+		Print("Square has no transversals\n");
+		return;
+	fi;
+	for i in [1..Size(transversals)] do
+		for j in [i+1..Size(transversals)] do
+			r:=Size(Intersection(transversals[i].blocks, transversals[j].blocks));
+			if  r > best_match.difference then
+				Print("New best! ",i," and ",j," only differ in ",D.vType[1]-r," places.\n");
+				best_match:=rec(t1:=transversals[i], t2:=transversals[j], difference:=D.vType[1]-r);
+			fi;
+		od;
+	od;
+	return best_match;
+end;
+
+HopTransversal:=function(square, transversal)
+	local i,subtransversal, possible_subgrids,subgridA,subgridB,subgridC,subgrids,t2, new_subtransversal, all_possible,m,c;
+	all_possible:=[];
+	c:=Combinations(transversal.blocks,3);
+	for m in c do
+		#Print("Working with ",m,"\n");
+		subtransversal:=m;
+		subgridA:=[];
+		subgridB:=[];
+		subgridC:=[];
+	
+		Add(subgridA, get_blocks_containing_list(square, [subtransversal[1][1],subtransversal[1][2]])[1]);
+		Add(subgridA, get_blocks_containing_list(square, [subtransversal[1][1],subtransversal[2][2]])[1]);
+		Add(subgridA, get_blocks_containing_list(square, [subtransversal[1][1],subtransversal[3][2]])[1]);
+	
+		Add(subgridB, get_blocks_containing_list(square, [subtransversal[2][1],subtransversal[1][2]])[1]);
+		Add(subgridB, get_blocks_containing_list(square, [subtransversal[2][1],subtransversal[2][2]])[1]);
+		Add(subgridB, get_blocks_containing_list(square, [subtransversal[2][1],subtransversal[3][2]])[1]);
+
+		Add(subgridC, get_blocks_containing_list(square, [subtransversal[3][1],subtransversal[1][2]])[1]);
+		Add(subgridC, get_blocks_containing_list(square, [subtransversal[3][1],subtransversal[2][2]])[1]);
+		Add(subgridC, get_blocks_containing_list(square, [subtransversal[3][1],subtransversal[3][2]])[1]);
+	
+		possible_subgrids:=Cartesian(subgridA,subgridB,subgridC);
+		possible_subgrids:=MultisetDifference(possible_subgrids, [subtransversal]);
+		subgrids:=[];
+		t2:=ShallowCopy(transversal);
+	
+		for i in [1..Size(possible_subgrids)] do
+			if Sort2(Unique(Flat(possible_subgrids[i]))) = Sort2(Unique(Flat(subtransversal))) then
+				Add(subgrids, possible_subgrids[i]);
+			fi;
+		od;
+		#Print("subgrids = ",subgrids,"\n");
+		if Size(subgrids)>0 then
+			Add(all_possible, [subtransversal, subgrids]);
+		fi;
+	od;
+	
+	if(Size(all_possible) = 0) then
+		Print("THIS TRANSVERSAL HAS NO FRIENDS\n");
+		return [];
+	fi;
+	new_subtransversal:=Random(all_possible);
+	t2.blocks:=MultisetDifference(t2.blocks, new_subtransversal[1]);
+	Append(t2.blocks, Random(new_subtransversal[2]));
+	t2.blocks:=SortListList(t2.blocks);
+	return t2;
+end;
+
+HopTransversal2:=function(square, transversal,numImps)
+	local i,j,subtransversal, possible_subgrids,subgridA,subgridB,subgridC,subgrids,t2, new_subtransversal,improper_match_distance,flag,variable_flag,potentials,t3;
+
+	subtransversal:=Random(Combinations(transversal.blocks,3));
+
+	improper_match_distance:=numImps;
+
+	subgridA:=[];
+	subgridB:=[];
+	subgridC:=[];
+
+	Add(subgridA, get_blocks_containing_list(square, [subtransversal[1][1],subtransversal[1][2]])[1]);
+	Add(subgridA, get_blocks_containing_list(square, [subtransversal[1][1],subtransversal[2][2]])[1]);
+	Add(subgridA, get_blocks_containing_list(square, [subtransversal[1][1],subtransversal[3][2]])[1]);
+
+	Add(subgridB, get_blocks_containing_list(square, [subtransversal[2][1],subtransversal[1][2]])[1]);
+	Add(subgridB, get_blocks_containing_list(square, [subtransversal[2][1],subtransversal[2][2]])[1]);
+	Add(subgridB, get_blocks_containing_list(square, [subtransversal[2][1],subtransversal[3][2]])[1]);
+
+	Add(subgridC, get_blocks_containing_list(square, [subtransversal[3][1],subtransversal[1][2]])[1]);
+	Add(subgridC, get_blocks_containing_list(square, [subtransversal[3][1],subtransversal[2][2]])[1]);
+	Add(subgridC, get_blocks_containing_list(square, [subtransversal[3][1],subtransversal[3][2]])[1]);
+
+	possible_subgrids:=MultisetDifference(Cartesian(subgridA,subgridB,subgridC), [subtransversal]);
+	subgrids:=[];
+	t2:=ShallowCopy(transversal);
+
+	potentials:=Sort2(Flat(subtransversal));
+
+	for i in [1..Size(possible_subgrids)] do
+		flag:=true;
+		variable_flag:=transversal.v/3;
+		# check there is a cell in each row
+		for j in [1..Size(potentials)/3] do
+			if Size(get_blocks_containing_list_from_blockList(possible_subgrids[i], [potentials[j]])) = 0 then
+				flag:=false;
+			fi;
+
+			if Size(get_blocks_containing_list_from_blockList(possible_subgrids[i], [potentials[j+Size(potentials)/3]])) = 0 then
+				flag:=false;
+			fi;
+
+		od;
+		
+		t3:=ShallowCopy(t2);
+		t3.blocks:=Union(MultisetDifference(t3.blocks, subtransversal), possible_subgrids[i]);
+		t3.blocks:=SortListList(GetMutableListList(t3.blocks));
+		if flag=true and Size(Unique(Flat(t3.blocks)))+improper_match_distance >= transversal.v then
+			Add(subgrids, t3);
+		else
+		fi;
+	od;
+
+	if(Size(subgrids) = 0) then
+		return [];
+	fi;
+	return Random(subgrids);
+end;
+
+IsTransversal:=function(D)
+	return Size(Unique(Flat(D.blocks)))=D.v and Size(D.blocks)=D.v/3;
+end;
+
+HopTransversal3:=function(square, transversal,numImps)
+	local i,j,subtransversal, possible_subgrids,subgridA,subgridB,subgridC,subgrids,t2, new_subtransversal,improper_match_distance,flag,variable_flag,potentials,t3,m,all;
+
+	all:=[];
+	for m in Combinations(transversal.blocks,3) do
+
+		subtransversal:=m;
+
+		improper_match_distance:=numImps;
+
+		subgridA:=[];
+		subgridB:=[];
+		subgridC:=[];
+
+		Add(subgridA, get_blocks_containing_list(square, [subtransversal[1][1],subtransversal[1][2]])[1]);
+		Add(subgridA, get_blocks_containing_list(square, [subtransversal[1][1],subtransversal[2][2]])[1]);
+		Add(subgridA, get_blocks_containing_list(square, [subtransversal[1][1],subtransversal[3][2]])[1]);
+
+		Add(subgridB, get_blocks_containing_list(square, [subtransversal[2][1],subtransversal[1][2]])[1]);
+		Add(subgridB, get_blocks_containing_list(square, [subtransversal[2][1],subtransversal[2][2]])[1]);
+		Add(subgridB, get_blocks_containing_list(square, [subtransversal[2][1],subtransversal[3][2]])[1]);
+
+		Add(subgridC, get_blocks_containing_list(square, [subtransversal[3][1],subtransversal[1][2]])[1]);
+		Add(subgridC, get_blocks_containing_list(square, [subtransversal[3][1],subtransversal[2][2]])[1]);
+		Add(subgridC, get_blocks_containing_list(square, [subtransversal[3][1],subtransversal[3][2]])[1]);
+
+		possible_subgrids:=MultisetDifference(Cartesian(subgridA,subgridB,subgridC), [subtransversal]);
+		subgrids:=[];
+		t2:=ShallowCopy(transversal);
+
+		potentials:=Sort2(Flat(subtransversal));
+
+		for i in [1..Size(possible_subgrids)] do
+			flag:=true;
+			variable_flag:=transversal.v/3;
+			# check there is a cell in each row
+			for j in [1..Size(potentials)/3] do
+				if Size(get_blocks_containing_list_from_blockList(possible_subgrids[i], [potentials[j]])) = 0 then
+					flag:=false;
+				fi;
+
+				if Size(get_blocks_containing_list_from_blockList(possible_subgrids[i], [potentials[j+Size(potentials)/3]])) = 0 then
+					flag:=false;
+				fi;
+
+			od;
+		
+			t3:=ShallowCopy(t2);
+			t3.blocks:=Union(MultisetDifference(t3.blocks, subtransversal), possible_subgrids[i]);
+			t3.blocks:=SortListList(GetMutableListList(t3.blocks));
+			if flag=true and Size(Unique(Flat(t3.blocks)))+improper_match_distance >= transversal.v then
+				Add(all,t3);
+			else
+			fi;
+		od;
+	od;
+	if(Size(all) = 0) then
+		return [];
+		#Error("There are no moves from this square.");
+	else
+		#Print("\t-- ",Size(all)," moves -- available from this ");
+		if(IsTransversal(transversal)) then
+			#Print("transversal\n");
+		else
+			#Print("NON-transversal\n");
+		fi;
+	fi;
+	return Random(all);
+end;
+
+
+ScanTrans:=function(square, transversal)
+	local found, total,t2;
+	total:=Size(FindAllTransversals(square, 1));
+	t2:=ShallowCopy(transversal);
+	found:=[t2];
+	Print("Total found = ",Size(found),"\n");
+	while Size(found) < total do
+		t2:=HopTransversal(square, t2);
+
+		if t2 = [] then
+			return found;
+		fi;
+
+		if t2 in found then
+			#do nothing
+		else
+			Add(found, t2);
+			Print("Total found = ",Size(found),"\n");
+		fi;
+	od;
+	return found;
+end;
+
+ScanTrans2:=function(square, transversal,numImps)
+	local found, total,t2,transversals_found,i;
+	i:=1;
+	if square.v < 40 then
+		total:=Size(FindAllTransversals(square, 1));
+	else 
+		total:="??";
+	fi;
+	t2:=ShallowCopy(transversal);
+	transversals_found:=[t2];
+	found:=[t2];
+	Print("Total found = ",Size(found),". Total transversals = ",Size(transversals_found),"/",total,"\n");
+	while true do
+		t2:=HopTransversal3(square, t2,numImps);
+
+		if not t2 in found then
+			Add(found, t2);
+			if IsTransversal(t2) then
+				Add(transversals_found, t2);
+			fi;
+		fi;
+		Print(i,": Total found = ",Size(found),". Total transversals = ",Size(transversals_found),"/",total,"\n");
+		i:=i+1;
+	od;
+	return transversals_found;
+end;
+
+couple:=function(x,y)
+	local m,x1,y1, coin1, coin2, coin3, pivot, removablesX, removablesY,i, row_choicesX, col_choicesX, sym_choicesX, row_choicesY, col_choicesY, sym_choicesY,pivotX,pivotY,d,k;
+	x1:=ShallowCopy(x);
+	y1:=ShallowCopy(y);
+	d:=Size(x.blocks) - Size(MultisetIntersection(x1.blocks, y1.blocks));
+	m:=0;
+	while d>0 do
+		m:=m+1;
+		d:=Size(x.blocks) - Size(MultisetIntersection(x1.blocks, y1.blocks));
+		Print(m,": matched ",Size(x.blocks)-d,"/",Size(x.blocks),"\t");
+		
+		for k in [1..Size(x.blocks)-d] do
+			Print("|");
+		od;
+		for k in [1..d] do
+			Print("-");
+		od;
+		Print("\n");
+		
+		
+		# if both proper
+		if x1.improper=false and y1.improper=false then
+			#Print("\tBoth proper\n");
+			pivot:=GeneratePivot(x1);
+			x1:=Hopper(x1,pivot,[]);
+			y1:=Hopper(y1,pivot,[]);
+			continue;
+		fi;
+		
+		# if both improper
+		if (x1.improper and y1.improper) then
+			#Print("\tBoth improper\n");
+			pivotX:=[];
+			pivotY:=[];
+			coin1:=Random([0,1]);
+			coin2:=Random([0,1]);
+			coin3:=Random([0,1]);
+			
+			removablesX:=SortListList(RemovableBlocks(x1, x1.negatives[1]));
+			removablesY:=SortListList(RemovableBlocks(y1, y1.negatives[1]));
+			
+			row_choicesX:=[];
+			col_choicesX:=[];
+			sym_choicesX:=[];
+		
+			for i in removablesX do
+				if not i[1] in row_choicesX then
+					Add(row_choicesX, i[1]);
+				fi;
+				if not i[2] in col_choicesX then
+					Add(col_choicesX, i[2]);
+				fi;
+				if not i[3] in sym_choicesX then
+					Add(sym_choicesX, i[3]);
+				fi;
+			od;
+	
+			row_choicesY:=[];
+			col_choicesY:=[];
+			sym_choicesY:=[];
+		
+			for i in removablesY do
+				if not i[1] in row_choicesY then
+					Add(row_choicesY, i[1]);
+				fi;
+				if not i[2] in col_choicesY then
+					Add(col_choicesY, i[2]);
+				fi;
+				if not i[3] in sym_choicesY then
+					Add(sym_choicesY, i[3]);
+				fi;
+			od;
+
+			if coin1 = 0 then
+				Add(pivotX, Minimum(row_choicesX));
+				Add(pivotY, Minimum(row_choicesY));
+			else
+				Add(pivotX, Maximum(row_choicesX));
+				Add(pivotY, Maximum(row_choicesY));
+			fi;
+	
+			if coin2 = 0 then
+				Add(pivotX, Minimum(col_choicesX));
+				Add(pivotY, Minimum(col_choicesY));
+			else
+				Add(pivotX, Maximum(col_choicesX));
+				Add(pivotY, Maximum(col_choicesY));
+			fi;
+	
+			if coin3 = 0 then
+				Add(pivotX, Minimum(sym_choicesX));
+				Add(pivotY, Minimum(sym_choicesY));
+			else
+				Add(pivotX, Maximum(sym_choicesX));
+				Add(pivotY, Maximum(sym_choicesY));
+			fi;
+
+			x1:=Hopper(x1, x1.negatives[1], pivotX);
+			y1:=Hopper(y1, y1.negatives[1], pivotY);
+			continue;
+		fi;
+
+		# if x1 improper and y1 proper
+		
+		if x1.improper and y1.improper=false then
+			#Print("\tx1 improper, y1 proper\n");
+			x1:=Hopper(x1,[],[]);
+			continue;
+		fi;
+		
+		
+		# if x1 proper and y1 improper
+		
+		if x1.improper=false and y1.improper then
+			#Print("\ty1 improper, x1 proper\n");
+			y1:=Hopper(y1,[],[]);
+			continue;
+		fi;
+		
+	od;
+end;
+
+HowOftenCanWeMove:=function(B)
+	local B2, transversals,attempts,successes,t;
+	attempts:=0;
+	successes:=0;
+	B2:=ShallowCopy(B);
+	while true do
+		B2:=ManyStepsProper(B2,5);;
+		transversals:=FindAllTransversals(B2,1);
+		if Size(transversals) = 0 then
+			continue;
+		fi;
+		attempts:=attempts+1;
+		t:=HopTransversal3(B2, Random(transversals), 0);
+
+		if t <> [] then
+			successes:=successes+1;
+		fi;
+		Print("(",successes,"/",attempts,"): ",Float(successes/attempts),"\n");
+	od;
+end;
+
+CompleteLS:=function(B)
+	local r,c,i,symbols, results,n,out;
+	results:=[];
+	r:=-1;
+	for i in [1..B.v/3] do
+		if Size(get_blocks_containing_list(B, [i])) < B.v/3 then
+			r:=i;
+			break;
+		fi;
+	od;
+	
+	if r = -1 then
+		#Print("Final--------\n",B,"\n\n");
+		return B;
+	fi;
+	
+	for i in [B.v/3+1..2*B.v/3] do
+		if Size(get_blocks_containing_list(B, [r,i])) = 0 then
+			c:=i;
+			break;
+		fi;
+	od;
+	symbols:=[2*B.v/3+1..B.v];
+	for i in [2*B.v/3+1..B.v] do
+		if Size(get_blocks_containing_list(B, [r,i]))>0 or Size(get_blocks_containing_list(B, [c,i]))>0 then
+			symbols:=MultisetDifference(symbols,[i]);
+		fi;
+	od;
+	
+	for i in Cartesian([r],[c],symbols) do
+		n:=BlockDesign(B.v, Union(B.blocks, [i]));
+		n.k:=[1,1,1];
+		Add(results,CompleteLS(n));
+	od;
+	return Unique(Flat(results));
+end;
+
+#q:=BlockDesign(3*4, [[1,5,9],[1,6,10],[1,7,11],[2,8,12]]);
+#q:=BlockDesign(3*4, [[1,5,9],[2,6,10],[3,7,11],[4,8,12]]);
+q:=BlockDesign(3*5, [[1,6,11],[1,7,13],[2,7,12],[2,8,11],[3,8,13],[3,6,12],[4,9,14],[5,10,15]]);
+#q:=BlockDesign(3*6, [[1,7,13],[2,8,14],[3,9,15],[4,10,16],[5,11,17],[6,12,18]]);
+q.k:=[1,1,1];
