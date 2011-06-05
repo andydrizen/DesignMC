@@ -180,6 +180,15 @@ BindGlobal("CurrentTime",function()
 	return CURRENT_TIME;
 end);
 
+BindGlobal("CurrentTimeHuman",function()
+	local random_string;
+	random_string:=Concatenation(String(Random([10000..99999])),".rd");
+	Exec(Concatenation("date \"+CURRENT_TIME:=\\\"%H:%M:%S, %d/%m/%Y\\\";\" > ",random_string) );
+	Read(random_string);
+	Exec(Concatenation("rm ",random_string));
+	return CURRENT_TIME;
+end);
+
 BindGlobal("ShowProgressIndicator",function(i)
 	local j;
 	if i > 1 then
@@ -215,3 +224,27 @@ BindGlobal("ShowPercentIndicator",function(i,total,start_time)
 	fi;
 	Print(percent_done,"%, Time remaining=",time_remaining,"\c");
 end);
+
+RemoveElement:=function(list, element)
+	local i, indices;
+	indices:=[];
+	for i in [1..Size(list)] do
+		if list[i] = element then
+			Add(indices, i);
+		fi;
+	od;
+	for i in indices do
+		Remove(list, i);
+	od;
+	return list;
+end;
+
+FirstOccurrenceOfElement:=function(list, element)
+	local i;
+	for i in [1..Size(list)] do
+		if list[i] = element then
+			return i;
+		fi;
+	od;
+	return -1;
+end;

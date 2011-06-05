@@ -805,9 +805,198 @@ CompleteLS:=function(B)
 	od;
 	return Unique(Flat(results));
 end;
+ 
 
-#q:=BlockDesign(3*4, [[1,5,9],[1,6,10],[1,7,11],[2,8,12]]);
-#q:=BlockDesign(3*4, [[1,5,9],[2,6,10],[3,7,11],[4,8,12]]);
-q:=BlockDesign(3*5, [[1,6,11],[1,7,13],[2,7,12],[2,8,11],[3,8,13],[3,6,12],[4,9,14],[5,10,15]]);
-#q:=BlockDesign(3*6, [[1,7,13],[2,8,14],[3,9,15],[4,10,16],[5,11,17],[6,12,18]]);
-q.k:=[1,1,1];
+CreateLatinRectangle:=function(B)
+    local B2,ir;
+    B2:=StructuralCopy(B);
+	for ir in [B2.vType[1]/2+1..B2.vType[1]] do
+		B2.blocks:=MultisetDifference(B2.blocks, get_blocks_containing_list(B2,[ir]));
+	od;
+	B2.vType[1]:=B2.vType[1]/2;
+	return B2;
+end;  
+
+DecomposeLR:=function(B)
+	local B2,transversals, i,j,k, transversal, possibilities, cell, choice,max_it;
+	B2:=ShallowCopy(B);
+	transversals:=[];
+	max_it:=1000;
+	for j in [1..B2.vType[2]] do
+		#Print(transversals,"\n");
+		transversal:=[];
+		for i in [1..B2.vType[1]] do
+			#Print("Entering for loop with i = ",i,"\n");
+			cell:=[];
+			#get all the blocks in this row
+			possibilities:=get_blocks_containing_list(B2, [i]);
+			#Print("\tpossibilities = ",possibilities,"\n");
+			k:=0;
+			while true do
+				if max_it<k then
+					#Print("I could only get ",Size(transversals),"/",B2.vType[2],"\n");
+					return transversals;
+				fi;
+				k:=k+1;
+				choice:=Random(possibilities);
+				#Print("\tchoice = ",choice,"\n");
+				if Size(Unique(Flat(Union(transversal, choice)))) = (Size(transversal)+1)*3 then
+					cell:=choice;
+					break;
+				fi;
+			od;
+			Add(transversal,cell);
+		od;
+		transversal:=SortListList(transversal);
+		Add(transversals, transversal);
+		B2.blocks:=MultisetDifference(B2.blocks, transversal);
+	od;
+	return transversals;
+end;
+
+FindFullDecomposition:=function(B)
+	local d,i,B2;
+	B2:=ShallowCopy(B);
+	i:=0;
+	while true do
+		i:=i+1;
+		#ShowProgressIndicator(i);
+		d:=DecomposeLR(B2);
+		if(Size(d) = B2.vType[2]) then
+			Print("\n");
+			return d;
+		fi;
+	od;
+end;
+FindNearDecomposition:=function(B)
+	local d,i,B2,random;
+	B2:=ShallowCopy(B);
+	i:=0;
+	while true do
+		i:=i+1;
+		#ShowProgressIndicator(i);
+		d:=DecomposeLR(B2);
+		if(Size(d) = B2.vType[2]-1) then
+			return d;
+		fi;
+		if(Size(d) = B2.vType[2]) then
+			random:=Random(d);
+			return MultisetDifference(d, [random]);
+		fi;
+		
+	od;
+end;
+FindNearNearDecomposition:=function(B)
+	local d,i,B2,random;
+	B2:=ShallowCopy(B);
+	i:=0;
+	while true do
+		i:=i+1;
+		#ShowProgressIndicator(i);
+		d:=DecomposeLR(B2);
+		if(Size(d) = B2.vType[2]-2) then
+			return d;
+		fi;
+	od;
+end;
+DecompositionSearch:=function(n)
+	local S,D,i;
+	S:=LS(n, 1);
+	i:=0;
+	while true do
+		i:=i+1;
+		Print("\n\n\n------------------------------------\nIteration ",i,": ",CurrentTimeHuman(),"\n------------------------------------\n\nGenerating new square...\n\n");
+		D:=StructuralCopy(S);
+		D:=CreateLatinRectangle(D);
+		Print(D,"\n\nFinding decomposition...\c");
+		FindFullDecomposition(D);
+		Print("Success.\n");
+		S:=ManyStepsProper(S, 30);
+	od;
+end;
+#UncoveredCell:=function(B, transversalDecomposition,row)
+#	local transversal,cell,columns_uncovered;
+#	columns_uncovered:=[B.vType[2]+1..2*B.vType[2]];
+#	# for now, we always use row 1.
+#	for transversal in transversalDecomposition do
+#		cell:=get_blocks_containing_list_from_blockList(transversal, [row])[1];
+#		RemoveElement(columns_uncovered, cell[2]);
+#	od;
+#	return get_blocks_containing_list(B, [row, Random(columns_uncovered)])[1];
+#end;
+UncoveredCells:=function(B, transversalDecomposition,row)
+	local transversal,cell,columns_uncovered;
+	columns_uncovered:=[B.vType[2]+1..2*B.vType[2]];
+	# for now, we always use row 1.
+	for transversal in transversalDecomposition do
+		cell:=get_blocks_containing_list_from_blockList(transversal, [row])[1];
+		RemoveElement(columns_uncovered, cell[2]);
+	od;
+	return get_blocks_containing_list(B, [row, Random(columns_uncovered)]);
+end;
+JengaMove:=function(B, transversalDecomposition,r)
+	local transversal, cell, columns_uncovered, cell_to_cover, cell_to_uncover,cells_in_selected_column,possibilities,chosen_trans,new_trans,new_transversal_decomposition;
+	columns_uncovered:=[B.vType[2]+1..2*B.vType[2]];
+	# for now, we always use row 1.
+	cell_to_cover:=Random(UncoveredCells(B, transversalDecomposition, r));
+	cells_in_selected_column:=get_blocks_containing_list(B, [cell_to_cover[2]]);
+	possibilities:=ShallowCopy(transversalDecomposition);
+	for cell in cells_in_selected_column do
+		for transversal in transversalDecomposition do
+			if cell in transversal then
+				RemoveElement(possibilities, transversal);
+			fi;
+		od;
+	od;
+	for transversal in transversalDecomposition do
+		for cell in transversal do
+			if cell_to_cover[3] in cell then
+				RemoveElement(possibilities, transversal);
+			fi;
+		od;
+	od;
+	chosen_trans:=Random(possibilities);
+	cell_to_uncover:=get_blocks_containing_list_from_blockList(chosen_trans, [r])[1];
+	new_trans:=Union(MultisetDifference(chosen_trans,[cell_to_uncover]), [cell_to_cover]);
+	new_transversal_decomposition:=Union(MultisetDifference(transversalDecomposition,[chosen_trans]), [new_trans]);
+	return new_transversal_decomposition;
+end;
+
+JengaHitTest:=function(B, transversalDecomposition)
+	local unseen_cells,newTD,uncovered_cell,uhoh,row;
+	newTD:=ShallowCopy(transversalDecomposition);
+	unseen_cells:=ShallowCopy(B.blocks);
+	#uncovered_cell:=UncoveredCell(B, newTD,row);
+	#unseen_cells:=RemoveElement(unseen_cells, uncovered_cell);
+	uhoh:=0;
+	while Size(unseen_cells) > 0 do
+		uhoh:=uhoh+1;
+		#if (uhoh mod 10000) = 0 then
+		#	Print("\nI might be stuck in a disconnected component... \n\tI haven't uncovered these symbols in row ",row," in ",uhoh," moves: ",unseen_cells,"\n");
+		#fi;
+		row:=Random([1..B.vType[1]]);
+		newTD:=JengaMove(B, newTD,row);
+		uncovered_cell:=Random(UncoveredCells(B, newTD,row));
+		unseen_cells:=RemoveElement(unseen_cells, uncovered_cell);
+	od;
+end;
+
+FindBadJenga:=function(n)
+	local B, TD, r, LR,i;
+	B:=LS(n, 1);	
+	i:=0;
+	while true do
+		i:=i+1;
+		Print("\n\n\n------------------------------------\nIteration ",i,": ",CurrentTimeHuman(),"\n------------------------------------\nGenerating new Latin rectangle of order ",n,"...\n");
+		B:=ManyStepsProper(B, 30);
+		LR:=ShallowCopy(B);
+		LR:=CreateLatinRectangle(LR);
+		PrettifyDesign(LR);
+		Print("\n",LR,"\nFinding near transversal decomposition...\n\n");
+		TD:=FindNearNearDecomposition(LR);
+		Print(TD,"\n\n");
+		Print("Attempting to move the uncovered cell in each row to every position in its row...\c");
+		JengaHitTest(LR, TD);
+		Print("Succeeded.\n");
+	od;
+end;
