@@ -226,17 +226,18 @@ BindGlobal("ShowPercentIndicator",function(i,total,start_time)
 end);
 
 RemoveElement:=function(list, element)
-	local i, indices;
+	local i, indices,list2;
+	list2:=ShallowCopy(list);
 	indices:=[];
-	for i in [1..Size(list)] do
-		if list[i] = element then
+	for i in [1..Size(list2)] do
+		if list2[i] = element then
 			Add(indices, i);
 		fi;
 	od;
 	for i in indices do
-		Remove(list, i);
+		Remove(list2, i);
 	od;
-	return list;
+	return list2;
 end;
 
 FirstOccurrenceOfElement:=function(list, element)

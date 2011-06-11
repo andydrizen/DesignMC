@@ -28,3 +28,23 @@ ReadPackage("DesignMC","lib/FindCounterExample.g");
 ReadPackage("DesignMC","lib/SurveyDesigns.g");
 ReadPackage("DesignMC","lib/Genetic.g");
 ReadPackage("DesignMC","lib/EstimateSizeOfSubsets.g");
+
+RereadDesignMC:=function()
+	RereadPackage("DesignMC","lib/StringFunctions.g");
+	RereadPackage("DesignMC","lib/JSON.g");
+	RereadPackage("DesignMC","lib/GenericFunctions.g");
+	RereadPackage("DesignMC","lib/BlockDesignFunctions.g");
+	RereadPackage("DesignMC","lib/DESIGNWrapper.g");
+	RereadPackage("DesignMC","lib/MarkovChain.g");
+	RereadPackage("DesignMC","lib/Hillclimbing.g");
+	RereadPackage("DesignMC","lib/PairGraph.g");
+	RereadPackage("DesignMC","lib/Database.g");
+	RereadPackage("DesignMC","lib/Sudoku.g");
+	RereadPackage("DesignMC","lib/CompleteLatinSquares.g");
+	RereadPackage("DesignMC","lib/LatinSquareAnalysis.g");
+	RereadPackage("DesignMC","lib/Misc.g");
+	RereadPackage("DesignMC","lib/FindCounterExample.g");
+	RereadPackage("DesignMC","lib/SurveyDesigns.g");
+	RereadPackage("DesignMC","lib/Genetic.g");
+	RereadPackage("DesignMC","lib/EstimateSizeOfSubsets.g");
+end;

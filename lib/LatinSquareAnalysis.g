@@ -807,13 +807,13 @@ CompleteLS:=function(B)
 end;
  
 
-CreateLatinRectangle:=function(B)
+CreateLatinRectangle:=function(B,k)
     local B2,ir;
     B2:=StructuralCopy(B);
-	for ir in [B2.vType[1]/2+1..B2.vType[1]] do
+	for ir in [B2.vType[1]/k+1..B2.vType[1]] do
 		B2.blocks:=MultisetDifference(B2.blocks, get_blocks_containing_list(B2,[ir]));
 	od;
-	B2.vType[1]:=B2.vType[1]/2;
+	B2.vType[1]:=B2.vType[1]/k;
 	return B2;
 end;  
 
@@ -899,6 +899,24 @@ FindNearNearDecomposition:=function(B)
 		fi;
 	od;
 end;
+FindMNearDecomposition:=function(B,m)
+	local d,i,B2,random;
+	B2:=ShallowCopy(B);
+	i:=0;
+	while true do
+		i:=i+1;
+		#ShowProgressIndicator(i);
+		d:=DecomposeLR(B2);
+		if(Size(d) >= B2.vType[2]-m) then
+			while Size(d) > B2.vType[2]-m do
+				random:=Random(d);
+				d:=RemoveElement(d, random);
+			od;
+			return d;
+		fi;		
+	od;
+end;
+
 DecompositionSearch:=function(n)
 	local S,D,i;
 	S:=LS(n, 1);
@@ -907,7 +925,7 @@ DecompositionSearch:=function(n)
 		i:=i+1;
 		Print("\n\n\n------------------------------------\nIteration ",i,": ",CurrentTimeHuman(),"\n------------------------------------\n\nGenerating new square...\n\n");
 		D:=StructuralCopy(S);
-		D:=CreateLatinRectangle(D);
+		D:=CreateLatinRectangle(D,2);
 		Print(D,"\n\nFinding decomposition...\c");
 		FindFullDecomposition(D);
 		Print("Success.\n");
@@ -933,6 +951,14 @@ UncoveredCells:=function(B, transversalDecomposition,row)
 		RemoveElement(columns_uncovered, cell[2]);
 	od;
 	return get_blocks_containing_list(B, [row, Random(columns_uncovered)]);
+end;
+AllUncoveredCells:=function(B, transversalDecomposition)
+	local uncovered,i;
+	uncovered:=[];
+	for i in [1..B.vType[1]] do
+		Add(uncovered, UncoveredCells(B, transversalDecomposition, i));
+	od;
+	return uncovered;
 end;
 JengaMove:=function(B, transversalDecomposition,r)
 	local transversal, cell, columns_uncovered, cell_to_cover, cell_to_uncover,cells_in_selected_column,possibilities,chosen_trans,new_trans,new_transversal_decomposition;
@@ -963,7 +989,7 @@ JengaMove:=function(B, transversalDecomposition,r)
 end;
 
 JengaHitTest:=function(B, transversalDecomposition)
-	local unseen_cells,newTD,uncovered_cell,uhoh,row;
+	local unseen_cells,newTD,uncovered_cell,uhoh,row,i;
 	newTD:=ShallowCopy(transversalDecomposition);
 	unseen_cells:=ShallowCopy(B.blocks);
 	#uncovered_cell:=UncoveredCell(B, newTD,row);
@@ -971,17 +997,23 @@ JengaHitTest:=function(B, transversalDecomposition)
 	uhoh:=0;
 	while Size(unseen_cells) > 0 do
 		uhoh:=uhoh+1;
-		#if (uhoh mod 10000) = 0 then
-		#	Print("\nI might be stuck in a disconnected component... \n\tI haven't uncovered these symbols in row ",row," in ",uhoh," moves: ",unseen_cells,"\n");
-		#fi;
+		if (uhoh mod 3000) = 0 then
+			Print("\nI might be stuck (unseen = ",unseen_cells,"). Uncovered cells: ",AllUncoveredCells(B, newTD),"...\c");
+			if Size(Unique(Flat(AllUncoveredCells(B, newTD)))) = 3*Size(AllUncoveredCells(B, newTD)) then
+				Print("a transversal!\n");
+				#break;
+			fi;
+		fi;
 		row:=Random([1..B.vType[1]]);
 		newTD:=JengaMove(B, newTD,row);
-		uncovered_cell:=Random(UncoveredCells(B, newTD,row));
-		unseen_cells:=RemoveElement(unseen_cells, uncovered_cell);
+		for i in UncoveredCells(B, newTD,row) do
+			unseen_cells:=RemoveElement(unseen_cells, i);
+		od;
 	od;
 end;
 
-FindBadJenga:=function(n)
+FindBadJenga:=function(n,k,howNear)
+	# this make an n by n/k latin rectangle.
 	local B, TD, r, LR,i;
 	B:=LS(n, 1);	
 	i:=0;
@@ -990,10 +1022,12 @@ FindBadJenga:=function(n)
 		Print("\n\n\n------------------------------------\nIteration ",i,": ",CurrentTimeHuman(),"\n------------------------------------\nGenerating new Latin rectangle of order ",n,"...\n");
 		B:=ManyStepsProper(B, 30);
 		LR:=ShallowCopy(B);
-		LR:=CreateLatinRectangle(LR);
+		LR:=CreateLatinRectangle(LR,k);
 		PrettifyDesign(LR);
 		Print("\n",LR,"\nFinding near transversal decomposition...\n\n");
-		TD:=FindNearNearDecomposition(LR);
+		#TD:=FindNearNearDecomposition(LR);
+		#TD:=FindNearDecomposition(LR);
+		TD:=FindMNearDecomposition(LR, howNear);
 		Print(TD,"\n\n");
 		Print("Attempting to move the uncovered cell in each row to every position in its row...\c");
 		JengaHitTest(LR, TD);
