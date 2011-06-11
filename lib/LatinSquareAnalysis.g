@@ -948,7 +948,7 @@ UncoveredCells:=function(B, transversalDecomposition,row)
 	# for now, we always use row 1.
 	for transversal in transversalDecomposition do
 		cell:=get_blocks_containing_list_from_blockList(transversal, [row])[1];
-		RemoveElement(columns_uncovered, cell[2]);
+		columns_uncovered:=RemoveElement(columns_uncovered, cell[2]);
 	od;
 	return get_blocks_containing_list(B, [row, Random(columns_uncovered)]);
 end;
@@ -964,27 +964,35 @@ JengaMove:=function(B, transversalDecomposition,r)
 	local transversal, cell, columns_uncovered, cell_to_cover, cell_to_uncover,cells_in_selected_column,possibilities,chosen_trans,new_trans,new_transversal_decomposition;
 	columns_uncovered:=[B.vType[2]+1..2*B.vType[2]];
 	# for now, we always use row 1.
+	
 	cell_to_cover:=Random(UncoveredCells(B, transversalDecomposition, r));
 	cells_in_selected_column:=get_blocks_containing_list(B, [cell_to_cover[2]]);
 	possibilities:=ShallowCopy(transversalDecomposition);
 	for cell in cells_in_selected_column do
 		for transversal in transversalDecomposition do
 			if cell in transversal then
-				RemoveElement(possibilities, transversal);
+				possibilities:=RemoveElement(possibilities, transversal);
 			fi;
 		od;
 	od;
 	for transversal in transversalDecomposition do
 		for cell in transversal do
 			if cell_to_cover[3] in cell then
-				RemoveElement(possibilities, transversal);
+				possibilities:=RemoveElement(possibilities, transversal);
 			fi;
 		od;
 	od;
 	chosen_trans:=Random(possibilities);
 	cell_to_uncover:=get_blocks_containing_list_from_blockList(chosen_trans, [r])[1];
+	
 	new_trans:=Union(MultisetDifference(chosen_trans,[cell_to_uncover]), [cell_to_cover]);
 	new_transversal_decomposition:=Union(MultisetDifference(transversalDecomposition,[chosen_trans]), [new_trans]);
+	
+	#Print("Uncovered cells in row ",r,": ",UncoveredCells(B, transversalDecomposition, r),"\n");
+	#Print("Current TD: ",transversalDecomposition,"\n");
+	#Print("Covering :",cell_to_cover,", uncovering: ",cell_to_uncover,"\n");
+	#Print("New TD: ",new_transversal_decomposition,"\n\n");
+	
 	return new_transversal_decomposition;
 end;
 
@@ -996,6 +1004,7 @@ JengaHitTest:=function(B, transversalDecomposition)
 	#unseen_cells:=RemoveElement(unseen_cells, uncovered_cell);
 	uhoh:=0;
 	while Size(unseen_cells) > 0 do
+		#Print("Uncovered cell on row 1 is at ",UncoveredCells(B, newTD,1)," Unseen: ",unseen_cells,"\n");
 		uhoh:=uhoh+1;
 		if (uhoh mod 3000) = 0 then
 			Print("\nI might be stuck (unseen = ",unseen_cells,"). Uncovered cells: ",AllUncoveredCells(B, newTD),"...\c");
@@ -1026,8 +1035,8 @@ FindBadJenga:=function(n,k,howNear)
 		PrettifyDesign(LR);
 		Print("\n",LR,"\nFinding near transversal decomposition...\n\n");
 		#TD:=FindNearNearDecomposition(LR);
-		#TD:=FindNearDecomposition(LR);
-		TD:=FindMNearDecomposition(LR, howNear);
+		TD:=FindNearDecomposition(LR);
+		#TD:=FindMNearDecomposition(LR, howNear);
 		Print(TD,"\n\n");
 		Print("Attempting to move the uncovered cell in each row to every position in its row...\c");
 		JengaHitTest(LR, TD);
