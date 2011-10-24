@@ -28,10 +28,10 @@ FindCounterExample:=function( D, counterExampleWillFailFunction )
 	return [];
 end;
 
-HasTransversal:=function(D)
-	if(Size(FindTransversal(D, D.tSubsetStructure.lambdas[1], true))>0) then
-		return true;
-	else
-		return false;
-	fi;
-end;
+# HasTransversal:=function(D)
+# 	if(Size(FindTransversal(D, D.tSubsetStructure.lambdas[1]))>0) then
+# 		return true;
+# 	else
+# 		return false;
+# 	fi;
+# end;

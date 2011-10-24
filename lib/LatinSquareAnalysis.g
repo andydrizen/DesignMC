@@ -996,35 +996,52 @@ JengaMove:=function(B, transversalDecomposition,r)
 	return new_transversal_decomposition;
 end;
 
-JengaHitTest:=function(B, transversalDecomposition)
-	local unseen_cells,newTD,uncovered_cell,uhoh,row,i;
+JengaHitTest:=function(B, transversalDecomposition,rows)
+	local unseen_cells,newTD,uncovered_cell,uhoh,row,i,row_list,ignored_rows,i2;
 	newTD:=ShallowCopy(transversalDecomposition);
 	unseen_cells:=ShallowCopy(B.blocks);
 	#uncovered_cell:=UncoveredCell(B, newTD,row);
 	#unseen_cells:=RemoveElement(unseen_cells, uncovered_cell);
 	uhoh:=0;
+
+	# set the rows to search.
+	row_list:=rows;
+	#row_list:=[3];
+	
 	while Size(unseen_cells) > 0 do
-		#Print("Uncovered cell on row 1 is at ",UncoveredCells(B, newTD,1)," Unseen: ",unseen_cells,"\n");
 		uhoh:=uhoh+1;
-		if (uhoh mod 3000) = 0 then
+		#ShowProgressIndicator(uhoh);
+		if (uhoh mod 10000) = 0 then
 			Print("\nI might be stuck (unseen = ",unseen_cells,"). Uncovered cells: ",AllUncoveredCells(B, newTD),"...\c");
 			if Size(Unique(Flat(AllUncoveredCells(B, newTD)))) = 3*Size(AllUncoveredCells(B, newTD)) then
 				Print("a transversal!\n");
 				#break;
 			fi;
 		fi;
-		row:=Random([1..B.vType[1]]);
-		newTD:=JengaMove(B, newTD,row);
-		for i in UncoveredCells(B, newTD,row) do
-			unseen_cells:=RemoveElement(unseen_cells, i);
+		
+		# remove any blocks that are outside the allowed rows
+		ignored_rows:=MultisetDifference([1..B.vType[1]], row_list);
+		for i2 in ignored_rows do
+			unseen_cells:=MultisetDifference(unseen_cells, get_blocks_containing_list(B, [i2]));
 		od;
+		
+		#for row in row_list do
+			row:=Random(row_list);
+			#Print("I was at: ",Random(UncoveredCells(B, newTD, row)));
+			newTD:=JengaMove(B, newTD,row);
+			#Print(".... and now I'm at: ",Random(UncoveredCells(B, newTD, row)),"\n");
+			for i in UncoveredCells(B, newTD,row) do
+				unseen_cells:=RemoveElement(unseen_cells, i);
+			od;
+		#od;
 	od;
 end;
 
 FindBadJenga:=function(n,k,howNear)
-	# this make an n by n/k latin rectangle.
-	local B, TD, r, LR,i;
+	# this makes an n by n/k latin rectangle.
+	local B, TD, LR,i,rows,r;
 	B:=LS(n, 1);	
+	B:=ManyStepsProper(B, 30);
 	i:=0;
 	while true do
 		i:=i+1;
@@ -1032,14 +1049,56 @@ FindBadJenga:=function(n,k,howNear)
 		B:=ManyStepsProper(B, 30);
 		LR:=ShallowCopy(B);
 		LR:=CreateLatinRectangle(LR,k);
+		#rows := [1..LR.vType[1]];
 		PrettifyDesign(LR);
 		Print("\n",LR,"\nFinding near transversal decomposition...\n\n");
 		#TD:=FindNearNearDecomposition(LR);
-		TD:=FindNearDecomposition(LR);
-		#TD:=FindMNearDecomposition(LR, howNear);
+		#TD:=FindNearDecomposition(LR);
+		TD:=FindMNearDecomposition(LR, howNear);
 		Print(TD,"\n\n");
 		Print("Attempting to move the uncovered cell in each row to every position in its row...\c");
-		JengaHitTest(LR, TD);
+		for r in [1..LR.vType[1]] do
+			JengaHitTest(LR, TD,[r]);
+		od;
 		Print("Succeeded.\n");
 	od;
 end;
+
+# The following Latin rectangle proves that the jenga move is not connected if you are isolated to one row.
+
+s:=rec(
+  isBlockDesign := true,
+  v := 45,
+  blocks := 
+[[1,16,42],[1,17,31],[1,18,36],[1,19,32],[1,20,33],[1,21,34],[1,22,44],[1,23,39],[1,24,38],[1,25,37],[1,26,40],[1,27,35],[1,28,43],[1,29,41],[1,30,45],
+[2,16,35],[2,17,43],[2,18,32],[2,19,33],[2,20,34],[2,21,39],[2,22,40],[2,23,38],[2,24,37],[2,25,36],[2,26,44],[2,27,42],[2,28,31],[2,29,45],[2,30,41],
+[3,16,43],[3,17,35],[3,18,33],[3,19,34],[3,20,39],[3,21,38],[3,22,41],[3,23,37],[3,24,36],[3,25,32],[3,26,45],[3,27,31],[3,28,42],[3,29,44],[3,30,40],
+[4,16,31],[4,17,42],[4,18,34],[4,19,39],[4,20,38],[4,21,37],[4,22,45],[4,23,36],[4,24,32],[4,25,33],[4,26,41],[4,27,43],[4,28,35],[4,29,40],[4,30,44],
+[5,16,45],[5,17,44],[5,18,39],[5,19,38],[5,20,37],[5,21,36],[5,22,31],[5,23,32],[5,24,33],[5,25,34],[5,26,35],[5,27,40],[5,28,41],[5,29,42],[5,30,43]],
+  k := [ 1, 1, 1 ],
+  improper := false,
+  vType := [ 5, 15, 15 ],
+  tSubsetStructure := rec(
+      lambdas := [ 1, 0 ] ),
+  negatives := [  ],
+  blockNumbers := [ 225 ],
+  isBinary := true,
+  isSimple := true );
+
+
+t:=[
+[ [1,16,42],[2,17,43],[3,27,31],[4,28,35],[5,25,34] ],
+[ [1,17,31],[2,16,35],[3,28,42],[4,27,43],[5,24,33] ],
+[ [1,22,44],[2,29,45],[3,30,40],[4,26,41],[5,18,39] ],
+[ [1,26,40],[2,30,41],[3,29,44],[4,22,45],[5,21,36] ],
+[ [1,27,35],[2,28,31],[3,16,43],[4,17,42],[5,23,32] ],
+[ [1,29,41],[2,22,40],[3,26,45],[4,30,44],[5,19,38] ],
+[ [1,30,45],[2,26,44],[3,22,41],[4,29,40],[5,20,37] ],
+[ [1,18,36],[2,19,33],[3,20,39],[4,21,37],[5,22,31] ],
+[ [1,19,32],[2,20,34],[3,21,38],[4,23,36],[5,27,40] ],
+[ [1,20,33],[2,21,39],[3,23,37],[4,24,32],[5,28,41] ],
+[ [1,21,34],[2,23,38],[3,24,36],[4,25,33],[5,29,42] ],
+[ [1,23,39],[2,24,37],[3,25,32],[4,18,34],[5,30,43] ],
+[ [1,24,38],[2,25,36],[3,18,33],[4,19,39],[5,16,45] ],
+[ [1,25,37],[2,25,37],[3,18,32],[4,20,38],[5,17,44] ],
+];

@@ -37,11 +37,11 @@
 # 
 ################################################################################
 
-BindGlobal("CreatePairGraph",function(D1,p1_red, D2,p2_blue ,path)
-	local mystring,list1, i,temp,j, file,num,s,l;
-
-	file:=Concatenation(path,".nb");
-
+BindGlobal("CreatePairGraph",function(D1,p1_red, D2,p2_blue)
+	local mystring,list1, i,temp,j, file,num,s,l,path;
+	path:="~/Desktop/file";
+	file:=Concatenation(String(path),".nb");
+	num:=path;
 	mystring:="g={";
 
 	# first point 
@@ -63,9 +63,9 @@ BindGlobal("CreatePairGraph",function(D1,p1_red, D2,p2_blue ,path)
 		fi;
 	od;
 
-	mystring:=Concatenation(mystring,"}; \n mygraph=GraphPlot[g, EdgeRenderingFunction -> ({If[#3 == \"D1-",String(p1_red),"\", Red, Blue],\n AbsoluteThickness[2],\n  Line[#1]} &),\n	VertexRenderingFunction -> ({White, EdgeForm[Black],\n  Black, \n   Text[Style[#2, Background -> White], #1]} &),\n VertexLabeling -> True]\n  Export[",path,".eps\",{ mygraph } ]\n");
+	mystring:=Concatenation(mystring,"}; \n mygraph=GraphPlot[g, EdgeRenderingFunction -> ({If[#3 == \"D1-",String(p1_red),"\", Red, Blue],\n AbsoluteThickness[2],\n  Line[#1]} &),\n	VertexRenderingFunction -> ({White, EdgeForm[Black],\n  Black, \n   Text[Style[#2, Background -> White], #1]} &),\n VertexLabeling -> True]\n  Export[\"",String(path),".eps\",{ mygraph } ]\n");
 
-	Print("EXPORTING USING MATHEMATICA ======== Export id: ",num,"\nAt most two error messages are admissible.\n\n");
+	Print("EXPORTING USING MATHEMATICA ======== Export id: ",String(num),"\nAt most two error messages are admissible.\n\n");
 	PrintTo(file, mystring);
 	Print("\n Trying the \"math\" command....\c");
 	Exec("math -run < ",file);
@@ -73,8 +73,8 @@ BindGlobal("CreatePairGraph",function(D1,p1_red, D2,p2_blue ,path)
 	Exec("/usr/local/mathematica/Executables/math -run < ",file);
 	Print("\n Trying the full path for MAC OS X....\c");
 	Exec("/Applications/Mathematica.app/Contents/MacOS/MathKernel < ",file);
-	Exec(Concatenation("open -a Preview sync/rbmc2/mathematica/",String(num),".eps"));
-	Exec(Concatenation("evince sync/rbmc2/mathematica/",String(num),".eps &"));
+	Exec(Concatenation("open -a Preview ",String(num),".eps"));
+	Exec(Concatenation("evince ",String(num),".eps &"));
 	
 end);
 

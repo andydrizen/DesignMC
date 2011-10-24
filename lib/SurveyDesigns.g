@@ -48,6 +48,6 @@ end;
 
 HasTransversals:=function(D)
 	local transversals;
-	transversals:=FindAllTransversals(D, D.tSubsetStructure.lambdas[1], true);
+	transversals:=FindAllTransversals(D, D.tSubsetStructure.lambdas[1]);
 	return transversals;
 end;
