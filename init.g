@@ -1,34 +1,38 @@
 #############################################################################
-##  
-##  DesignMC                                                     A. L. Drizen
-##  15th February 2011                                                           
-## 
+#  
+#  DesignMC                                                     A. L. Drizen
+#  15th February 2011                                                           
+# 
+#############################################################################
 
-
-LoadPackage("design");
+LoadPackage("DESIGN");
 LoadPackage("JSONGAP");
 
-BindGlobal("MAX_NEGATIVE_BLOCKS", 1);
-CURRENT_TIME:=fail;
+BindGlobal("DMC_MAX_NEGATIVE_BLOCKS", 1);
+BindGlobal("DMC_CURRENT_TIME", fail);
+DMC_SUDOKU_FOUND := [];
 
 RereadDesignMC:=function()
 	RereadPackage("DesignMC","lib/StringFunctions.g");
 	RereadPackage("DesignMC","lib/JSON.g");
-	RereadPackage("DesignMC","lib/GenericFunctions.g");
-	RereadPackage("DesignMC","lib/BlockDesignFunctions.g");
-	RereadPackage("DesignMC","lib/DESIGNWrapper.g");
-	RereadPackage("DesignMC","lib/MarkovChain.g");
-	RereadPackage("DesignMC","lib/Hillclimbing.g");
-	RereadPackage("DesignMC","lib/PairGraph.g");
-	RereadPackage("DesignMC","lib/Database.g");
-	RereadPackage("DesignMC","lib/Sudoku.g");
-	RereadPackage("DesignMC","lib/CompleteLatinSquares.g");
-	RereadPackage("DesignMC","lib/LatinSquareAnalysis.g");
-	RereadPackage("DesignMC","lib/Misc.g");
-	RereadPackage("DesignMC","lib/FindCounterExample.g");
-	RereadPackage("DesignMC","lib/SurveyDesigns.g");
-	RereadPackage("DesignMC","lib/Genetic.g");
-	RereadPackage("DesignMC","lib/EstimateSizeOfSubsets.g");
+	RereadPackage("DesignMC","lib/DMCGenericFunctions.g");
+	RereadPackage("DesignMC","lib/DMCBlockDesignFunctions.g");
+	RereadPackage("DesignMC","lib/DMCDesignWrapper.g");
+	RereadPackage("DesignMC","lib/DMCMarkovChain.g");
+	RereadPackage("DesignMC","lib/DMCHillclimbing.g");
+	RereadPackage("DesignMC","lib/DMCPairGraph.g");
+	RereadPackage("DesignMC","lib/DMCMySQL.g");
+	RereadPackage("DesignMC","lib/DMCIO.g");
+	RereadPackage("DesignMC","lib/DMCJSON.g");
+ 	RereadPackage("DesignMC","lib/DMCSudoku.g");
+	RereadPackage("DesignMC","lib/DMCCompleteLatinSquares.g");
+	RereadPackage("DesignMC","lib/DMCLatinSquareAnalysis.g");
+	RereadPackage("DesignMC","lib/DMCSteinerTripleSystems.g");
+	RereadPackage("DesignMC","lib/DMCMisc.g");
+	RereadPackage("DesignMC","lib/DMCDMCFindCounterExample.g");
+	RereadPackage("DesignMC","lib/DMCSurveyDesigns.g");
+	RereadPackage("DesignMC","lib/DMCGenetic.g");
+	RereadPackage("DesignMC","lib/DMCEstimateSizeOfSubsets.g");
 end;
 
 RereadDesignMC();
