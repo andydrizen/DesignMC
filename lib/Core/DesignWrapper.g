@@ -11,18 +11,18 @@
 # XX() e.g. EnumerateTripleSystems(7, 1, 0) = TripleSystemMake(7, 1).
 #
 # QuickLatinSquare
-# ProduceLatinSquare
+# ProduceSquare
 # ProduceLamdaFactorisation
 # ProduceTripleSystem
 # Make2Design
-# MakeLatinSquare
-# MakeImproperLatinSquare
+# MakeSquare
+# MakeImproperSquare
 # MakeLambdaFactorisation
 # MakeImproperLambdaFactorisation
 # MakeTripleSystem
 # MakeImproperTripleSystem
-# EnumerateLatinSquares
-# EnumerateImproperLatinSquares
+# EnumerateSquares
+# EnumerateImproperSquares
 # EnumerateLambdaFactorisations
 # EnumerateImproperLambdaFactorisations
 # EnumerateTripleSystems
@@ -52,7 +52,7 @@ BindGlobal("QuickLatinSquare",function(n)
 	return D;
 end);
 
-BindGlobal("ProduceLatinSquare",function(input)
+BindGlobal("ProduceSquare",function(input)
 	#input is a rec. You should, at the very least, include these:
 	
 		# "v" (list): 	A tuple of positive integers, e.g. [2,4,6]. This means your square 
@@ -517,7 +517,7 @@ end);
 
 BindGlobal("Make2Design",function(input)
 	if input.k = [1,1,1] then
-		return ProduceLatinSquare(input);
+		return ProduceSquare(input);
 	fi;
 	if input.k = [2,1] then
 		return ProduceLamdaFactorisation(input);
@@ -527,7 +527,7 @@ BindGlobal("Make2Design",function(input)
 	fi;
 end);
 
-BindGlobal("MakeLatinSquare",function(n,lambdaInt)
+BindGlobal("MakeSquare",function(n,lambdaInt)
 	local results;
 	if lambdaInt = 1 then
 		results:=[QuickLatinSquare(n)];
@@ -541,7 +541,7 @@ BindGlobal("MakeLatinSquare",function(n,lambdaInt)
 	fi;
 end);
 
-BindGlobal("MakeImproperLatinSquare",function(n,lambdaInt)
+BindGlobal("MakeImproperSquare",function(n,lambdaInt)
 	local results;
 	results:=Make2Design( rec(v:=[n,n,n], k:=[1,1,1], improper:=true, lambdas:=[lambdaInt,lambdaInt,lambdaInt]) );
 	if Size(results)>0 then
@@ -595,11 +595,11 @@ end);
 # Enumeration functions (like above but with an isoLevel option).
 #
 
-BindGlobal("EnumerateLatinSquares",function(n,lambdaInt, isoLevel)
+BindGlobal("EnumerateSquares",function(n,lambdaInt, isoLevel)
 	return Make2Design( rec(v:=[n,n,n], k:=[1,1,1], lambdas:=[lambdaInt,lambdaInt,lambdaInt], isoLevel:=isoLevel) );
 end);
 
-BindGlobal("EnumerateImproperLatinSquares",function(n,lambdaInt,isoLevel)
+BindGlobal("EnumerateImproperSquares",function(n,lambdaInt,isoLevel)
 	return Make2Design( rec(v:=[n,n,n], k:=[1,1,1], improper:=true, lambdas:=[lambdaInt,lambdaInt,lambdaInt], isoLevel:=isoLevel) );
 end);
 
