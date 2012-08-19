@@ -39,6 +39,8 @@ Quick Start
 
 These functions are wrappers for Soicher's [DESIGN Package](http://designtheory.org/software/gap_design/). They handle the boiler plate code that is required to generate the particular designs in which we are interested.
 
+---
+
 ### QuickLatinSquare
 
 #### Required Parameters
@@ -59,6 +61,8 @@ Returns the cyclic Latin square of order n.
 	k := [ 1, 1, 1 ], negatives := [  ], 
 	tSubsetStructure := rec( lambdas := [ 1, 0 ] ), v := 12, 
 	vType := [ 4, 4, 4 ] )
+
+---
 
 ### ProduceSquare
 
@@ -85,6 +89,7 @@ Returns a square with the specified parameters.
 #### Usage
 
     gap> input:=rec(v:=[4,4,4], lambdas:=[2,2,2], isoLevel:=0, improper:=true);;
+    gap> ProduceSquare(input);
     [ rec( 
       autSubgroup := Group(
         [ (1,5)(2,6)(3,7)(4,8), (1,9,5)(2,12,6)(3,10,7)(4,11,8) ]), 
@@ -118,68 +123,131 @@ Returns a square with the specified parameters.
                   [ 11, 12 ] ], [ [ 1, 5 ], [ 1, 9 ], [ 5, 9 ] ] ], t := 2 ), 
       v := 12, vType := [ 4, 4, 4 ] ) ]
 
+---
+
 ### ProduceLamdaFactorisation
+
+---
 
 ### ProduceTripleSystem
 
+---
+
 ### Make2Design
+
+---
 
 ### MakeSquare
 
+---
+
 ### MakeImproperSquare
+
+---
 
 ### MakeLambdaFactorisation
 
+---
+
 ### MakeImproperLambdaFactorisation
+
+---
 
 ### MakeTripleSystem
 
+---
+
 ### MakeImproperTripleSystem
+
+---
 
 ## Enumerating Generalised 2-designs
 
+---
+
 ### EnumerateSquares
+
+---
 
 ### EnumerateImproperSquares
 
+---
+
 ### EnumerateLambdaFactorisations
+
+---
 
 ### EnumerateImproperLambdaFactorisations
 
+---
+
 ### EnumerateTripleSystems
+
+---
 
 ### EnumerateImproperTripleSystems
 
+---
+
 ## Moving Around the Markov Chain
+
+---
 
 ### GeneratePivot
 
+---
+
 ### RemovableBlocks
+
+---
 
 ### Hopper
 
+---
+
 ### OneStep
+
+---
 
 ### ManyStepsProper
 
+---
+
 ### ManyStepsImproper
+
+---
 
 ### RandomWalkOnMarkovChain
 
+---
+
 ## Pair Graphs
+
+---
 
 ### CreatePairGraph
 
+---
+
 ### FindAlternatingTrail
+
+---
 
 ### FindAlternatingTrailWithoutGivenBlueEdge
 
+---
+
 ### FindAllAlternatingTrails
+
+---
 
 ### ComponentsOfGraph
 
+---
+
 ### IsChordedDG
 
+---
 
 References
 ----------
