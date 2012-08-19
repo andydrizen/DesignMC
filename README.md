@@ -35,7 +35,7 @@ Alternatively, you can download the source to any/folder/you/like/DesignMC and t
 Quick Start
 -----------
 
-## Generating Generalised 2-designs
+### Generating Generalised 2-designs
 
 These functions are wrappers for Soicher's [DESIGN Package](http://designtheory.org/software/gap_design/). They handle the boiler plate code that is required to generate the particular designs in which we are interested.
 
