@@ -1,22 +1,22 @@
 ################################################################################
-# DesignMC/lib/DMCMySQL.g 		                                    Andy L. Drizen
+# DesignMC/lib/MySQL.g 		                                    Andy L. Drizen
 #                                                                   15/02/2011
 # File overview:
 # 
-# The DMCExportToMySQLWithBlockDesign function outputs a MySQL query so that you can store 
+# The ExportToMySQLWithBlockDesign function outputs a MySQL query so that you can store 
 # your designs in a MySQL Database, if you like. Example usage is:
 #
 # for j in [1..2] do 
 #	for i in [4..19] do 
-#		e:=DMCEnumerateImproperTripleSystems(i,j,0);;
+#		e:=EnumerateImproperTripleSystems(i,j,0);;
 #		tot:=0;
-#		DMCExportToMySQLWithBlockDesign(e, tot); 
+#		ExportToMySQLWithBlockDesign(e, tot); 
 #	od; 
 # od;
 #
 ################################################################################
 
-BindGlobal("DMCExportToMySQLWithBlockDesign",function(e,total_systems)
+BindGlobal("ExportToMySQLWithBlockDesign",function(e,total_systems)
 	local lambdas,L;
 	if Size(e)=0 then 
 		return 0;
