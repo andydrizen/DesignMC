@@ -1,5 +1,5 @@
 ################################################################################
-# DesignMC/lib/DMCCompleteLatinSquares.g                        Andy L. Drizen
+# DesignMC/lib/CompleteLatinSquares.g                        Andy L. Drizen
 #                                                                   15/02/2011
 # File overview:
 # 
@@ -9,33 +9,37 @@
 # move around the Markov chain to find these squares. Thirdly, given a list of 
 # BlockDesigns, check which are row/column complete.
 #
+# IsBlockDesignCompleteLatinSquare
+# ScanForCompleteLatinSquares
+# ScanForCompleteLatinSquaresInList
+#
 ################################################################################
 
-BindGlobal("DMCIsBlockDesignCompleteLatinSquare",function(B,IsRowComplete,IsColumnComplete)
+BindGlobal("IsBlockDesignCompleteLatinSquare",function(B,IsRowComplete,IsColumnComplete)
 	local res,tmp,block,elt,elt2,i,flag,j;
 	res:=[];
 
 		
 	for elt in [B.v/3*2+1..B.v] do
-		tmp:=DMCGetBlocksContainingList(B, [elt]);
+		tmp:=GetBlocksContainingList(B, [elt]);
 		Add(res, [[],[],[],[]]);
 		for block in tmp do
 			if block[3] = elt then
 				# get elts on down
 				if not block[1]=B.v/3 then
-					Add(res[Size(res)][1], DMCGetBlocksContainingList(B,[block[1]+1,block[2]])[1][3]);
+					Add(res[Size(res)][1], GetBlocksContainingList(B,[block[1]+1,block[2]])[1][3]);
 				fi;
 				# get elts on right
 				if not block[2]=B.v/3*2 then
-					Add(res[Size(res)][2], DMCGetBlocksContainingList(B,[block[1],block[2]+1])[1][3]);
+					Add(res[Size(res)][2], GetBlocksContainingList(B,[block[1],block[2]+1])[1][3]);
 				fi;
 				# get elts on left
 				if not block[2]=B.v/3+1 then
-					Add(res[Size(res)][3], DMCGetBlocksContainingList(B,[block[1],block[2]-1])[1][3]);
+					Add(res[Size(res)][3], GetBlocksContainingList(B,[block[1],block[2]-1])[1][3]);
 				fi;
 				# get elts on up
 				if not block[1]=1 then
-					Add(res[Size(res)][4], DMCGetBlocksContainingList(B,[block[1]-1,block[2]])[1][3]);
+					Add(res[Size(res)][4], GetBlocksContainingList(B,[block[1]-1,block[2]])[1][3]);
 				fi;
 			fi;
 		od;
@@ -70,7 +74,7 @@ BindGlobal("DMCIsBlockDesignCompleteLatinSquare",function(B,IsRowComplete,IsColu
 	fi;
 end);
 
-BindGlobal("DMCScanForCompleteLatinSquares",function(B,IsRowComplete,IsColumnComplete)
+BindGlobal("ScanForCompleteLatinSquares",function(B,IsRowComplete,IsColumnComplete)
 	local B2,non_iso_found,found,i,flag,k,got;
 	found:=[];
 	i:=0;
@@ -78,7 +82,7 @@ BindGlobal("DMCScanForCompleteLatinSquares",function(B,IsRowComplete,IsColumnCom
 	B2:=ShallowCopy(B);
 	while true do
 		i:=i+1;
-		flag:=DMCIsBlockDesignCompleteLatinSquare(B2,IsRowComplete,IsColumnComplete);
+		flag:=IsBlockDesignCompleteLatinSquare(B2,IsRowComplete,IsColumnComplete);
 		if flag=1 then
 			got:=0;
 			for k in found do
@@ -93,7 +97,7 @@ BindGlobal("DMCScanForCompleteLatinSquares",function(B,IsRowComplete,IsColumnCom
 				non_iso_found:=BlockDesignIsomorphismClassRepresentatives(non_iso_found);
 			fi;
 		fi;
-		DMCShowProgressIndicator(i);
+		ShowProgressIndicator(i);
 		
 		if flag=1 then
 			Print(": NonIso Found = ",Size(non_iso_found),",\t Total Found: ",Size(found),"\n");
@@ -102,16 +106,16 @@ BindGlobal("DMCScanForCompleteLatinSquares",function(B,IsRowComplete,IsColumnCom
 	od;
 end);
 
-BindGlobal("DMCScanForCompleteLatinSquaresInList",function(List, IsRowComplete, IsColumnComplete)
+BindGlobal("ScanForCompleteLatinSquaresInList",function(List, IsRowComplete, IsColumnComplete)
 	local B2,non_iso_found,found,i,flag,k,got,start_time;
 	found:=[];
 	i:=0;
-	start_time:=DMCTime();
+	start_time:=Time();
 	non_iso_found:=[];
 
 	for B2 in List do
 		i:=i+1;
-		flag:=DMCIsBlockDesignCompleteLatinSquare(B2,IsRowComplete,IsColumnComplete);
+		flag:=IsBlockDesignCompleteLatinSquare(B2,IsRowComplete,IsColumnComplete);
 		if flag=1 then
 			got:=0;
 			for k in found do
@@ -127,7 +131,7 @@ BindGlobal("DMCScanForCompleteLatinSquaresInList",function(List, IsRowComplete, 
 			fi;
 		fi;
 		
-		DMCShowPercentIndicator(i,Size(List),start_time);
+		ShowPercentIndicator(i,Size(List),start_time);
 	
 		if flag=1 then
 			Print(": NonIso Found = ",Size(non_iso_found),",\t Total Found: ",Size(found),"\n");

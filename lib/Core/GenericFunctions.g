@@ -5,39 +5,26 @@
 # 
 # This file contains functions that I wish GAP had by default.
 #
-# DMCDuplicateList
+# DuplicateList
+# CopyAndSort
+# CopyAndSortListList
+# ApplyPermutationToList
+# AreListPermurmable 
+# MultisetDifference
+# MultisetIntersection
+# ListListMutableCopy
+# EmailResult
+# Time
+# TimeHuman
+# ShowProgressIndicator
+# ShowPercentIndicatorSimple
+# ShowPercentIndicator
+# RemoveElement
+# FirstOccurrenceOfElement
 #
-# DMCSort2 (like GAPs built in Sort funciton, but returns the sorted list.)
-#
-# DMCSortListList
-#
-# DMCApplyPermutationToList (applies a permutation to a list)
-#
-# DMCAreListPermurmable (tries to find a permutation connecting mapping ListList1 to 
-# ListList2)
-#
-# DMCMultisetDifference
-#
-# DMCMultisetIntersection
-#
-# DMCListListMutableCopy
-#
-# DMCEmailResult
-# example usuage:
-# e:=DMCEnumerateTripleSystems(15,1);PrintTo("STS15.g", e);DMCEmailResult("sombody@mail.com",
-# "someSTS15s", Concatenation("Job Done!\nThere are ",String(Size(e))," STS15s in this group"), "STS15.g");
-#
-# DMCTime
-#
-# DMCShowProgressIndicator
-#
-# DMCShowPercentIndicatorSimple
-#
-# DMCShowPercentIndicator
-# 
 ###############################################################################
 
-BindGlobal("DMCDuplicateList",function(list, number_of_times)
+BindGlobal("DuplicateList",function(list, number_of_times)
 	local tmp,i;
 	tmp:=[];
 	for i in [1..number_of_times] do
@@ -51,14 +38,14 @@ end);
 #
 
 
-BindGlobal("DMCSort2",function(object)
+BindGlobal("CopyAndSort",function(object)
 	local o2;
 	o2:=ShallowCopy(object);
 	Sort(o2);
 	return o2;
 end);
 
-BindGlobal("DMCSortListList",function(listlist)
+BindGlobal("CopyAndSortListList",function(listlist)
 	local i;
 	for i in [1..Size(listlist)] do
 		listlist[i]:=ShallowCopy(listlist[i]);
@@ -69,7 +56,7 @@ BindGlobal("DMCSortListList",function(listlist)
 	return listlist;
 end);
 
-BindGlobal("DMCApplyPermutationToList",function(ListLists, perm,ordered)
+BindGlobal("ApplyPermutationToList",function(ListLists, perm,ordered)
 	local i2,j2,myList;
 	myList:=StructuralCopy(ListLists);
 	for i2 in [1..Size(myList)] do
@@ -79,13 +66,13 @@ BindGlobal("DMCApplyPermutationToList",function(ListLists, perm,ordered)
 			fi;
 		od;
 		if ordered=0 then 
-			myList[i2]:=DMCSort2(myList[i2]);
+			myList[i2]:=CopyAndSort(myList[i2]);
 		fi;
 	od;
 	return myList;
 end);
 
-BindGlobal("DMCAreListPermurmable",function(ListList1, ListList2, SizeOfSn ,ordered)
+BindGlobal("AreListPermurmable",function(ListList1, ListList2, SizeOfSn ,ordered)
 	local group,i,results,myList1, myList2,j;
 	myList1:=StructuralCopy(ListList1);
 	myList2:=StructuralCopy(ListList2);
@@ -93,17 +80,17 @@ BindGlobal("DMCAreListPermurmable",function(ListList1, ListList2, SizeOfSn ,orde
 	results:=[];
 	if ordered = 0 then
 		for i in [1..Size(myList1)] do
-			myList1[i]:=DMCSort2(myList1[i]);
+			myList1[i]:=CopyAndSort(myList1[i]);
 		od;
 		for i in [1..Size(myList2)] do
-			myList2[i]:=DMCSort2(myList2[i]);
+			myList2[i]:=CopyAndSort(myList2[i]);
 		od;
 	fi;
 	j:=0;
 	for i in group do
 		j:=j+1;
 		Print(j,"/",Size(SymmetricGroup(SizeOfSn)),"\t ",Int(j*100/Size(SymmetricGroup(SizeOfSn))),"% \t Suitable permutations found: ",Size(results),"\n");
-		if DMCSort2(myList2)=DMCSort2(DMCApplyPermutationToList(myList1, i,ordered)) then
+		if CopyAndSort(myList2)=CopyAndSort(ApplyPermutationToList(myList1, i,ordered)) then
 			Print(i,"\n");
 			Add(results, i);
 		fi;
@@ -112,7 +99,7 @@ BindGlobal("DMCAreListPermurmable",function(ListList1, ListList2, SizeOfSn ,orde
 	return results;
 end);
 
-BindGlobal("DMCMultisetDifference",function(A,B)
+BindGlobal("MultisetDifference",function(A,B)
 	local difference,i,j,k,ca;
 	if IsSet(A) and IsSet(B) then
 		return Difference(A,B);
@@ -131,7 +118,7 @@ BindGlobal("DMCMultisetDifference",function(A,B)
 	return difference;
 end);
 
-BindGlobal("DMCMultisetIntersection",function(A,B)
+BindGlobal("MultisetIntersection",function(A,B)
 	local difference,i,j,k,ca;
 	if IsSet(A) and IsSet(B) then
 		return Intersection(A,B);
@@ -150,7 +137,7 @@ BindGlobal("DMCMultisetIntersection",function(A,B)
 	return difference;
 end);
 
-BindGlobal("DMCListListMutableCopy",function(ListList)
+BindGlobal("ListListMutableCopy",function(ListList)
 	local i, newList;
 	newList:=[];
 	for i in ListList do
@@ -159,7 +146,12 @@ BindGlobal("DMCListListMutableCopy",function(ListList)
 	return newList;
 end);
 
-BindGlobal("DMCEmailResult",function(to, subject,message,fileattach)
+
+# example usuage of EmailResult:
+# e:=EnumerateTripleSystems(15,1);PrintTo("STS15.g", e);EmailResult("sombody@mail.com",
+# "someSTS15s", Concatenation("Job Done!\nThere are ",String(Size(e))," STS15s in this group"), "STS15.g");
+
+BindGlobal("EmailResult",function(to, subject,message,fileattach)
 
 	local attach;
 	if fileattach = 0 then
@@ -171,25 +163,25 @@ BindGlobal("DMCEmailResult",function(to, subject,message,fileattach)
 end);
 
 
-BindGlobal("DMCTime",function()
+BindGlobal("Time",function()
 	local random_string;
 	random_string:=Concatenation(String(Random([10000..99999])),".rd");
-	Exec(Concatenation("date \"+DMC_CURRENT_TIME:=+%s;\" > ",random_string) );
+	Exec(Concatenation("date \"+CURRENT_TIME:=+%s;\" > ",random_string) );
 	Read(random_string);
 	Exec(Concatenation("rm ",random_string));
-	return DMC_CURRENT_TIME;
+	return CURRENT_TIME;
 end);
 
-BindGlobal("DMCTimeHuman",function()
+BindGlobal("TimeHuman",function()
 	local random_string;
 	random_string:=Concatenation(String(Random([10000..99999])),".rd");
-	Exec(Concatenation("date \"+DMC_CURRENT_TIME:=\\\"%H:%M:%S, %d/%m/%Y\\\";\" > ",random_string) );
+	Exec(Concatenation("date \"+CURRENT_TIME:=\\\"%H:%M:%S, %d/%m/%Y\\\";\" > ",random_string) );
 	Read(random_string);
 	Exec(Concatenation("rm ",random_string));
-	return DMC_CURRENT_TIME;
+	return CURRENT_TIME;
 end);
 
-BindGlobal("DMCShowProgressIndicator",function(i)
+BindGlobal("ShowProgressIndicator",function(i)
 	local j;
 	if i > 1 then
 		for j in [1..Length(DigitsNumber(i-1,10)) ] do
@@ -199,7 +191,7 @@ BindGlobal("DMCShowProgressIndicator",function(i)
 	Print(i,"\c");
 end);
 
-BindGlobal("DMCShowPercentIndicatorSimple",function(i,total)
+BindGlobal("ShowPercentIndicatorSimple",function(i,total)
 	local j;
 	if i > 0 then
 		for j in [1..(Length(DigitsNumber(i-1,10))+1+Length(DigitsNumber(total,10))) ] do
@@ -209,15 +201,15 @@ BindGlobal("DMCShowPercentIndicatorSimple",function(i,total)
 	Print(i,"/",total,"\c");
 end);
 
-BindGlobal("DMCShowPercentIndicator",function(i,total,start_time)
+BindGlobal("ShowPercentIndicator",function(i,total,start_time)
 	local j,percent_done,average_time,time_remaining,time_remaining_old,percent_done_old;
 	
 	#it has take this long to do i things. There are total-i left to go
-	time_remaining:=Int((total-i)*((DMCTime()-start_time)/i));
+	time_remaining:=Int((total-i)*((Time()-start_time)/i));
 	percent_done:=Int(i*100/total);
 	percent_done_old:=Int((i-1)*100/total);
 	if i > 1 then
-		time_remaining_old:=Int((total-i-1)*((DMCTime()-start_time)/(i-1)));
+		time_remaining_old:=Int((total-i-1)*((Time()-start_time)/(i-1)));
 		for j in [1..Maximum(1, Length(DigitsNumber(percent_done_old,10)))+19+Maximum(1, Length(DigitsNumber(time_remaining_old,10))) ] do
 			Print("\b");
 		od;
@@ -225,7 +217,7 @@ BindGlobal("DMCShowPercentIndicator",function(i,total,start_time)
 	Print(percent_done,"%, Time remaining=",time_remaining,"\c");
 end);
 
-DMCRemoveElement:=function(list, element)
+BindGlobal("RemoveElement", function(list, element)
 	local i, indices,list2;
 	list2:=ShallowCopy(list);
 	indices:=[];
@@ -238,9 +230,9 @@ DMCRemoveElement:=function(list, element)
 		Remove(list2, i);
 	od;
 	return list2;
-end;
+end);
 
-DMCFirstOccurrenceOfElement:=function(list, element)
+BindGlobal("FirstOccurrenceOfElement", function(list, element)
 	local i;
 	for i in [1..Size(list)] do
 		if list[i] = element then
@@ -248,4 +240,4 @@ DMCFirstOccurrenceOfElement:=function(list, element)
 		fi;
 	od;
 	return -1;
-end;
+end);

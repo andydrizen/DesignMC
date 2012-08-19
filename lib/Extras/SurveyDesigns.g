@@ -3,7 +3,11 @@
 #                                                                   15/02/2011
 # File overview:
 #
-#
+# SurveyDesigns
+# HasIntercalates
+# HasNoSubsquares
+# HasTransversals
+# 
 ################################################################################
 
 BindGlobal("SurveyDesigns", function( D, experiments, mixingTime, path )
@@ -46,8 +50,8 @@ BindGlobal("HasNoSubsquares", function(D)
 	return [];
 end);
 
-BindGlobal("DMCHasTransversals", function(D)
+BindGlobal("HasTransversals", function(D)
 	local transversals;
-	transversals:=DMCFindAllTransversals(D, D.tSubsetStructure.lambdas[1]);
+	transversals:=FindAllTransversals(D, D.tSubsetStructure.lambdas[1]);
 	return transversals;
 end);

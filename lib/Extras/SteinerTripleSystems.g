@@ -1,12 +1,13 @@
 ################################################################################
-# DesignMC/lib/DMCJSON.g					                        Andy L. Drizen
+# DesignMC/lib/SteinerTripleSystems.g	                        Andy L. Drizen
 #                                                                   15/02/2011
 # File overview:
 # 
+# IsBlockDesignPartialSTS
 #
 ################################################################################
 
-BindGlobal("DMCIsBlockDesignPartialSTS",function(B)
+BindGlobal("IsBlockDesignPartialSTS",function(B)
 	local seen,i,tmp;
 	seen:=[];
 	for i in B.blocks do

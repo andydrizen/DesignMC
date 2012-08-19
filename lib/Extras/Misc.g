@@ -39,7 +39,7 @@
 
 BindGlobal("ScanLotsOfImproperLFK2Ns",function(n, L)
 	local m, r,i;
-	m:=DMCLambdaFactorisationMake(n, L);
+	m:=MakeLambdaFactorisation(n, L);
 	i:=0;
 	while true do
 		i:=i+1;
@@ -47,7 +47,7 @@ BindGlobal("ScanLotsOfImproperLFK2Ns",function(n, L)
 		while m.improper=0 do
 			m:=ManyStepsImproper(m, 100);
 		od;
-		r:=DMCGetSpecialBlocksForImproperDesign(m);
+		r:=GetSpecialBlocksForImproperDesign(m);
 		if Size(r)>1 then
 			Print("\n",i,": ---------\n\n ",m,"\n");
 			FindAlternatingTrailWithoutGivenBlueEdge(m);
@@ -62,7 +62,7 @@ BindGlobal("ScanLotsOfImproperLFK2NsForLeastNumberOfTrails",function(B)
 	emptyLFfound:=[];
 	zeroHunting:= 0;
 	if (not B.k = [2,1]) or Size(B.negatives)=0 then
-		Print("This function is for DMCImproperLambdaFactorisationMake(n,l) only.\n");
+		Print("This function is for MakeImproperLambdaFactorisation(n,l) only.\n");
 		return;
 	fi;
 	m:=ShallowCopy(B);
@@ -70,17 +70,17 @@ BindGlobal("ScanLotsOfImproperLFK2NsForLeastNumberOfTrails",function(B)
 	while true do
 		i:=i+1;
 		
-		r:=DMCGetSpecialBlocksForImproperDesign(m);
+		r:=GetSpecialBlocksForImproperDesign(m);
 		if Size(r)>1 then
 			# the next line gets the colours
-			tries:=DMCMultisetDifference(DMCSortListList(Cartesian([m.negatives[1][3]], DMCMultisetDifference([m.vType[1]+1..m.vType[1]+m.vType[2]],[m.negatives[1][3]]))), DMCSortListList(r));
+			tries:=MultisetDifference(CopyAndSortListList(Cartesian([m.negatives[1][3]], MultisetDifference([m.vType[1]+1..m.vType[1]+m.vType[2]],[m.negatives[1][3]]))), CopyAndSortListList(r));
 			Print("tries = ",tries, "\n");
 			
 			for j in tries do
 				# now lets get the edges that we can delete
 				# but first, what colour is the edge we should delete?
-				badColour:=DMCMultisetDifference(j, m.negatives[1])[1];
-				deletableEdges:=DMCGetBlocksContainingList(m, [badColour,m.negatives[1][1]]);
+				badColour:=MultisetDifference(j, m.negatives[1])[1];
+				deletableEdges:=GetBlocksContainingList(m, [badColour,m.negatives[1][1]]);
 				Print("deletableEdges = ",deletableEdges, "\n");
 				for k in deletableEdges do
 
@@ -91,7 +91,7 @@ BindGlobal("ScanLotsOfImproperLFK2NsForLeastNumberOfTrails",function(B)
 
 						if zeroHunting = 1 then
 							if tmp = 0 then
-								if Size(DMCComponentsOfGraph(BlockDesign(m.v, DMCMultisetDifference(m.blocks, DMCGetBlocksContainingList(m, [m.negatives[1][1], badColour]))), [m.negatives[1][2], badColour]))=DMCComponentsOfGraph(m, [m.negatives[1][1], badColour]) then
+								if Size(ComponentsOfGraph(BlockDesign(m.v, MultisetDifference(m.blocks, GetBlocksContainingList(m, [m.negatives[1][1], badColour]))), [m.negatives[1][2], badColour]))=ComponentsOfGraph(m, [m.negatives[1][1], badColour]) then
 									Add(emptyLFfound, [m, m.negatives[1][3], badColour]);
 									Print("\n",m,"\nNew worst: ",tmp," (forbidden edge = ",k,", col1=",m.negatives[1][3],", col2=",badColour,", start=",m.negatives[1][1],", end=",m.negatives[1][2]," #=",Size(emptyLFfound),")\n");
 								fi;
@@ -123,7 +123,7 @@ BindGlobal("T1T2Pair",function(v,a,b)
 		Add(blocks, (blocks[1]+i) mod v);
 	od;
 	blocks:=blocks+1;
-	t1:=BlockDesign(v, DMCSortListList(blocks));
+	t1:=BlockDesign(v, CopyAndSortListList(blocks));
 	t1.negatives:=[];
 	t1.improper:=false;
 	t1.k:=[3];
@@ -133,7 +133,7 @@ BindGlobal("T1T2Pair",function(v,a,b)
 		Add(blocks, (blocks[1]+i) mod v);
 	od;
 	blocks:=blocks+1;
-	t2:=BlockDesign(v, DMCSortListList(blocks));
+	t2:=BlockDesign(v, CopyAndSortListList(blocks));
 	t2.negatives:=[];
 	t2.improper:=false;
 	t2.k:=[3];
@@ -206,7 +206,7 @@ BindGlobal("find_admissible",function(v)
 	local a,b;
 	for a in [0..v-1] do 
 		for b in [0..v-1] do 
-			if test_conditions(a,b,v)=1 and DMCIsBlockDesignPartialSTS(T1T2Pair(v,a,b)[1])=1 and DMCIsBlockDesignPartialSTS(T1T2Pair(v,a,b)[2])=1 then 
+			if test_conditions(a,b,v)=1 and IsBlockDesignPartialSTS(T1T2Pair(v,a,b)[1])=1 and IsBlockDesignPartialSTS(T1T2Pair(v,a,b)[2])=1 then 
 				Print("a=",a," b=",b,"\n"); 
 			fi; 
 		od;
@@ -217,11 +217,11 @@ BindGlobal("FindBitrade",function(B)
 	local B1,B2,T1,T2,T1B, T2B, SharedBlocks;
 	B1:=ShallowCopy(B);
 	B2:=OneStep(B1);
-	T1:=DMCListListMutableCopy(B1.blocks);
-	T2:=DMCListListMutableCopy(B2.blocks);
-	SharedBlocks:=DMCMultisetIntersection(T1,T2);
-	T1:=DMCMultisetDifference(T1, SharedBlocks);
-	T2:=DMCMultisetDifference(T2, SharedBlocks);
+	T1:=ListListMutableCopy(B1.blocks);
+	T2:=ListListMutableCopy(B2.blocks);
+	SharedBlocks:=MultisetIntersection(T1,T2);
+	T1:=MultisetDifference(T1, SharedBlocks);
+	T2:=MultisetDifference(T2, SharedBlocks);
 	if not (T1=[] and T2=[]) then
 		T1B:=BlockDesign(B1.v, T1);
 		T2B:=BlockDesign(B1.v, T2);
@@ -269,7 +269,7 @@ BindGlobal("FindBridgeToChordTrade",function(B)
 	local B2,common_blocks,t1,t2,flag,i;
 	flag:=0;
 	B2:=ShallowCopy(B);
-	for i in DMCGetSpecialBlocksForImproperDesign(B) do
+	for i in GetSpecialBlocksForImproperDesign(B) do
 		if IsChordedDG(B2, i) then
 			flag:=1; break;
 		fi;
@@ -280,17 +280,17 @@ BindGlobal("FindBridgeToChordTrade",function(B)
 	fi;
 	while flag=0 do
 		B2:=ManyStepsImproper(B2,Random([1,2,3]));
-		for i in DMCGetSpecialBlocksForImproperDesign(B2) do
+		for i in GetSpecialBlocksForImproperDesign(B2) do
 			if IsChordedDG(B2, i) then
 				flag:=1; 
 				break;
 			fi;
 		od;
 	od;
-	common_blocks:=DMCMultisetIntersection(B2.blocks, B.blocks);
+	common_blocks:=MultisetIntersection(B2.blocks, B.blocks);
 	if Size(common_blocks)<Size(B.blocks) then
-		t1:=BlockDesign(B.v, DMCMultisetDifference(B.blocks, common_blocks));
-		t2:=BlockDesign(B.v, DMCMultisetDifference(B2.blocks, common_blocks));
+		t1:=BlockDesign(B.v, MultisetDifference(B.blocks, common_blocks));
+		t2:=BlockDesign(B.v, MultisetDifference(B2.blocks, common_blocks));
 		t1.negatives:=B.negatives;
 		t2.negatives:=B2.negatives;
 	
@@ -331,6 +331,6 @@ BindGlobal("FindLotsOfBridgeToChordTrade",function(B, numPoints)
 			fi;
 		fi;
 		# Progress Bar
-		DMCShowProgressIndicator(it);
+		ShowProgressIndicator(it);
 	od;
 end);

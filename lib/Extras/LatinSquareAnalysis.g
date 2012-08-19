@@ -3,18 +3,46 @@
 #                                                                   15/02/2011
 # File overview:
 # 
-# DMCFindTransversal
-# DMCFindAllTransversals
-#
-# DMCPartialTransversalsBruteForce will (in a brute force fashion) try to find all partial 
-# transversals.
+# FindTransversal
+# FindAllTransversals
+# PartialTransversalsBruteForce
+# FindAllTransversalsBruteForce
+# FindAllSubSquaresOfSizeImproved
+# FindAllSubSquaresOfSize
+# NumTransversals
+# NumIntercalates
+# findSquareWithLessThanKTransversals
+# GetIndexOfElementInList
+# GetIndexOfIsomorphicElementInList
+# UniqueBlockDesigns
+# TransitionMatrix
+# FindSquareWithLeastTransversals
+# FindMaximallyIntersectingDistinctTransversals
+# HopTransversal
+# HopTransversal2
+# IsTransversal
+# HopTransversal3
+# ScanTrans
+# ScanTrans2
+# couple
+# HowOftenCanWeMove
+# CompleteLatinSquare
+# CreateLatinRectangle
+# DecomposeLR
+# FindFullDecomposition
+# FindNearDecomposition
+# FindNearNearDecomposition
+# FindMNearDecomposition
+# DecompositionSearch
+# UncoveredCells
+# AllUncoveredCells
+# JengaMove
+# JengaHitTest
+# FindBadJenga
 # 
-# DMCFindAllTransversalsBruteForce will filter PartialTransversals to remove any items
-# which are not full transversals.
-#
 ################################################################################
 
-BindGlobal("DMCFindTransversal",function(Design,lambda)
+BindGlobal("FindTransversal",function(Design,lambda)
 	return BlockDesigns(
 		rec(
 		    v:=Design.v, 
@@ -27,7 +55,7 @@ BindGlobal("DMCFindTransversal",function(Design,lambda)
 	);
 end);
 
-BindGlobal("DMCFindAllTransversals",function(Design,lambda)
+BindGlobal("FindAllTransversals",function(Design,lambda)
 	return BlockDesigns(
 		rec(
 		    v:=Design.v, 
@@ -41,13 +69,10 @@ BindGlobal("DMCFindAllTransversals",function(Design,lambda)
 end);
 
 
-# dependencies: 	DMCListListMutableCopy, DMCSort2, DMCSortListList, DMCDuplicateList, DMCGetBlocksContainingList,
-#					DMCShowPercentIndicatorSimple, DMCMultisetDifference
-
 # forward declaration
-DMCPartialTransversalsBruteForce:=function();end;
+PartialTransversalsBruteForce:=function();end;
 
-BindGlobal("DMCPartialTransversalsBruteForce",function( D, lambda, findAll, depth )
+BindGlobal("PartialTransversalsBruteForce",function( D, lambda, findAll, depth )
 local i,j,k,transversal,all_transversals,chosen_block,sub_design_blocks,tmp,D2,E,tmp_point_set,m;
 	D2:=ShallowCopy(D);
 	all_transversals:=[];
@@ -55,16 +80,16 @@ local i,j,k,transversal,all_transversals,chosen_block,sub_design_blocks,tmp,D2,E
 	
 		# all of the initial setup happens here
 	
-		D2.blocks:=DMCListListMutableCopy(D2.blocks);
+		D2.blocks:=ListListMutableCopy(D2.blocks);
 		for i in [1..Size(D2.blocks)] do
 			Add(D2.blocks[i],[i]);
 		od;
-		D2.blocks:=DMCSortListList(D2.blocks);
+		D2.blocks:=CopyAndSortListList(D2.blocks);
 		D2.v:=D2.v+Size(D2.blocks);
-		D2.point_set:=DMCSort2(DMCDuplicateList([1..(D2.v-Size(D2.blocks))],lambda));
+		D2.point_set:=CopyAndSort(DuplicateList([1..(D2.v-Size(D2.blocks))],lambda));
 	fi;
 	
-	for i in [1..Size(DMCGetBlocksContainingList(D2, [D2.blocks[1][1]]))] do
+	for i in [1..Size(GetBlocksContainingList(D2, [D2.blocks[1][1]]))] do
 	
 		if (IsBound(D2.tSubsetStructure)) then
 			m:=D2.tSubsetStructure.lambdas[1];
@@ -73,18 +98,18 @@ local i,j,k,transversal,all_transversals,chosen_block,sub_design_blocks,tmp,D2,E
 		fi;
 	
 		if(depth = 1 and findAll = true) then
-			DMCShowPercentIndicatorSimple(i-1,m*(D2.v-Size(D2.blocks))/3);
+			ShowPercentIndicatorSimple(i-1,m*(D2.v-Size(D2.blocks))/3);
 		fi;
 	
 		tmp_point_set:=ShallowCopy(D2.point_set);
-		chosen_block:=DMCGetBlocksContainingList(D2, [D2.blocks[1][1]])[i];
+		chosen_block:=GetBlocksContainingList(D2, [D2.blocks[1][1]])[i];
 		
 		sub_design_blocks:=ShallowCopy(D2.blocks);
-		sub_design_blocks:=DMCMultisetDifference(sub_design_blocks, [chosen_block]);
+		sub_design_blocks:=MultisetDifference(sub_design_blocks, [chosen_block]);
 		for j in chosen_block do
-			tmp_point_set:=DMCMultisetDifference(tmp_point_set, [j]);
+			tmp_point_set:=MultisetDifference(tmp_point_set, [j]);
 			if ( not( j in tmp_point_set )) then
-				sub_design_blocks:=DMCMultisetDifference(sub_design_blocks, DMCGetBlocksContainingList(D2, [j]));
+				sub_design_blocks:=MultisetDifference(sub_design_blocks, GetBlocksContainingList(D2, [j]));
 			fi;
 		od;
 		
@@ -92,7 +117,7 @@ local i,j,k,transversal,all_transversals,chosen_block,sub_design_blocks,tmp,D2,E
 			# we haven't yet made a full transversal.
 			E:=BlockDesign(D2.v, sub_design_blocks);
 			E.point_set:=ShallowCopy(tmp_point_set);
-			tmp:=DMCPartialTransversalsBruteForce(E,lambda, findAll, depth+1);
+			tmp:=PartialTransversalsBruteForce(E,lambda, findAll, depth+1);
 			for j in tmp do
 				transversal:=[];
 				for k in j do
@@ -108,15 +133,15 @@ local i,j,k,transversal,all_transversals,chosen_block,sub_design_blocks,tmp,D2,E
 		if(findAll = false ) then
 			for transversal in all_transversals do
 				if(Size(transversal) = (D2.v-Size(D2.blocks))/3 ) then
-					return Unique(DMCSortListList(all_transversals));
+					return Unique(CopyAndSortListList(all_transversals));
 				fi;
 			od;
 		fi;
 	od;
-	return Unique(DMCSortListList(all_transversals));
+	return Unique(CopyAndSortListList(all_transversals));
 end);
 
-BindGlobal("DMCFindAllTransversalsBruteForce",function(input)
+BindGlobal("FindAllTransversalsBruteForce",function(input)
 
 	# Finds a set of lambda*n cells, lambda in each row,
 	# lambda in each column and each symbol appears in 
@@ -145,7 +170,7 @@ BindGlobal("DMCFindAllTransversalsBruteForce",function(input)
 		pfindAll:=false;
 	fi;
 	
-	partials:=DMCPartialTransversalsBruteForce(D2, plambda, pfindAll,1);
+	partials:=PartialTransversalsBruteForce(D2, plambda, pfindAll,1);
 	results:=[];
 	for i in partials do
 		if (Size(i) = D2.v/3 * plambda) then
@@ -178,7 +203,7 @@ BindGlobal("FindAllSubSquaresOfSizeImproved",function(D, subsquareSize)
 			blocks:=[];
 			symbols:=[];
 			for k in Cartesian(rowsInSubSquare,colsInSubSquare) do
-				for l in DMCGetBlocksContainingList(D, k) do
+				for l in GetBlocksContainingList(D, k) do
 					Add(symbols, l[3]);
 					Add(blocks, l);
 				od;
@@ -207,7 +232,7 @@ BindGlobal("FindAllSubSquaresOfSize",function(D, subsquareSize)
 			blocks:=[];
 			symbols:=[];
 			for k in Cartesian(rowsInSubSquare,colsInSubSquare) do
-				for l in DMCGetBlocksContainingList(D, k) do
+				for l in GetBlocksContainingList(D, k) do
 					Add(symbols, l[3]);
 					Add(blocks, l);
 				od;
@@ -222,8 +247,9 @@ BindGlobal("FindAllSubSquaresOfSize",function(D, subsquareSize)
 	od;
 	return results;
 end);
+
 BindGlobal("NumTransversals",function(Design)
-	return Size(DMCFindAllTransversals(Design, 1, true));
+	return Size(FindAllTransversals(Design, 1, true));
 end);
 BindGlobal("NumIntercalates",function(Design)
 	return Size(FindAllSubSquaresOfSize(Design, 2));
@@ -231,10 +257,10 @@ end);
 
 BindGlobal("findSquareWithLessThanKTransversals", function(n, k)
 	local q,m;
-	q:=DMCLatinSquareMake(n,1);;
+	q:=LatinSquareMake(n,1);;
 	while true do 
 		q:=ManyStepsProper(q,10);; 
-		m:=Size(DMCFindAllTransversals(q, 1, true)); 
+		m:=Size(FindAllTransversals(q, 1, true)); 
 		Print(m, " \c"); 
 		if(m < k) then 
 			Print("\n\n",q,"\n"); 
@@ -289,14 +315,14 @@ BindGlobal("TransitionMatrix", function(squares)
 	# zero the transition_matrix
 
 	for i in [1..Size(squares)] do
-		Add(transition_matrix, DMCDuplicateList([0], Size(squares)));
+		Add(transition_matrix, DuplicateList([0], Size(squares)));
 	od;
 	
 	# only compute the proper moves once.
 	prop_moves:=Cartesian([1..squares[i].vType[1]], [squares[i].vType[1]+1..squares[i].vType[1]+squares[i].vType[2]], [squares[i].vType[1]+squares[i].vType[2]+1..squares[i].vType[1]+squares[i].vType[2]+squares[i].vType[3]]);
 
 	for i in [1..Size(squares)] do
-		DMCShowProgressIndicator(i);
+		ShowProgressIndicator(i);
 		if Size(squares[i].negatives)>0 then
 			# get all 8 possible moves, and then try them all.
 			imp_moves:=RemovableBlocks(squares[i], squares[i].negatives[1]);
@@ -374,7 +400,7 @@ end);
 BindGlobal("FindMaximallyIntersectingDistinctTransversals", function(D)
 	local transversals, i, j, best_match,r;
 	best_match:=rec(t1:=0, t2:=0, difference:=0);
-	transversals:=DMCFindAllTransversals(D, 1);
+	transversals:=FindAllTransversals(D, 1);
 	if Size(transversals) = 0 then
 		Print("Square has no transversals\n");
 		return;
@@ -402,25 +428,25 @@ BindGlobal("HopTransversal", function(square, transversal)
 		subgridB:=[];
 		subgridC:=[];
 	
-		Add(subgridA, DMCGetBlocksContainingList(square, [subtransversal[1][1],subtransversal[1][2]])[1]);
-		Add(subgridA, DMCGetBlocksContainingList(square, [subtransversal[1][1],subtransversal[2][2]])[1]);
-		Add(subgridA, DMCGetBlocksContainingList(square, [subtransversal[1][1],subtransversal[3][2]])[1]);
+		Add(subgridA, GetBlocksContainingList(square, [subtransversal[1][1],subtransversal[1][2]])[1]);
+		Add(subgridA, GetBlocksContainingList(square, [subtransversal[1][1],subtransversal[2][2]])[1]);
+		Add(subgridA, GetBlocksContainingList(square, [subtransversal[1][1],subtransversal[3][2]])[1]);
 	
-		Add(subgridB, DMCGetBlocksContainingList(square, [subtransversal[2][1],subtransversal[1][2]])[1]);
-		Add(subgridB, DMCGetBlocksContainingList(square, [subtransversal[2][1],subtransversal[2][2]])[1]);
-		Add(subgridB, DMCGetBlocksContainingList(square, [subtransversal[2][1],subtransversal[3][2]])[1]);
+		Add(subgridB, GetBlocksContainingList(square, [subtransversal[2][1],subtransversal[1][2]])[1]);
+		Add(subgridB, GetBlocksContainingList(square, [subtransversal[2][1],subtransversal[2][2]])[1]);
+		Add(subgridB, GetBlocksContainingList(square, [subtransversal[2][1],subtransversal[3][2]])[1]);
 
-		Add(subgridC, DMCGetBlocksContainingList(square, [subtransversal[3][1],subtransversal[1][2]])[1]);
-		Add(subgridC, DMCGetBlocksContainingList(square, [subtransversal[3][1],subtransversal[2][2]])[1]);
-		Add(subgridC, DMCGetBlocksContainingList(square, [subtransversal[3][1],subtransversal[3][2]])[1]);
+		Add(subgridC, GetBlocksContainingList(square, [subtransversal[3][1],subtransversal[1][2]])[1]);
+		Add(subgridC, GetBlocksContainingList(square, [subtransversal[3][1],subtransversal[2][2]])[1]);
+		Add(subgridC, GetBlocksContainingList(square, [subtransversal[3][1],subtransversal[3][2]])[1]);
 	
 		possible_subgrids:=Cartesian(subgridA,subgridB,subgridC);
-		possible_subgrids:=DMCMultisetDifference(possible_subgrids, [subtransversal]);
+		possible_subgrids:=MultisetDifference(possible_subgrids, [subtransversal]);
 		subgrids:=[];
 		t2:=ShallowCopy(transversal);
 	
 		for i in [1..Size(possible_subgrids)] do
-			if DMCSort2(Unique(Flat(possible_subgrids[i]))) = DMCSort2(Unique(Flat(subtransversal))) then
+			if CopyAndSort(Unique(Flat(possible_subgrids[i]))) = CopyAndSort(Unique(Flat(subtransversal))) then
 				Add(subgrids, possible_subgrids[i]);
 			fi;
 		od;
@@ -435,9 +461,9 @@ BindGlobal("HopTransversal", function(square, transversal)
 		return [];
 	fi;
 	new_subtransversal:=Random(all_possible);
-	t2.blocks:=DMCMultisetDifference(t2.blocks, new_subtransversal[1]);
+	t2.blocks:=MultisetDifference(t2.blocks, new_subtransversal[1]);
 	Append(t2.blocks, Random(new_subtransversal[2]));
-	t2.blocks:=DMCSortListList(t2.blocks);
+	t2.blocks:=CopyAndSortListList(t2.blocks);
 	return t2;
 end);
 
@@ -452,42 +478,42 @@ BindGlobal("HopTransversal2", function(square, transversal,numImps)
 	subgridB:=[];
 	subgridC:=[];
 
-	Add(subgridA, DMCGetBlocksContainingList(square, [subtransversal[1][1],subtransversal[1][2]])[1]);
-	Add(subgridA, DMCGetBlocksContainingList(square, [subtransversal[1][1],subtransversal[2][2]])[1]);
-	Add(subgridA, DMCGetBlocksContainingList(square, [subtransversal[1][1],subtransversal[3][2]])[1]);
+	Add(subgridA, GetBlocksContainingList(square, [subtransversal[1][1],subtransversal[1][2]])[1]);
+	Add(subgridA, GetBlocksContainingList(square, [subtransversal[1][1],subtransversal[2][2]])[1]);
+	Add(subgridA, GetBlocksContainingList(square, [subtransversal[1][1],subtransversal[3][2]])[1]);
 
-	Add(subgridB, DMCGetBlocksContainingList(square, [subtransversal[2][1],subtransversal[1][2]])[1]);
-	Add(subgridB, DMCGetBlocksContainingList(square, [subtransversal[2][1],subtransversal[2][2]])[1]);
-	Add(subgridB, DMCGetBlocksContainingList(square, [subtransversal[2][1],subtransversal[3][2]])[1]);
+	Add(subgridB, GetBlocksContainingList(square, [subtransversal[2][1],subtransversal[1][2]])[1]);
+	Add(subgridB, GetBlocksContainingList(square, [subtransversal[2][1],subtransversal[2][2]])[1]);
+	Add(subgridB, GetBlocksContainingList(square, [subtransversal[2][1],subtransversal[3][2]])[1]);
 
-	Add(subgridC, DMCGetBlocksContainingList(square, [subtransversal[3][1],subtransversal[1][2]])[1]);
-	Add(subgridC, DMCGetBlocksContainingList(square, [subtransversal[3][1],subtransversal[2][2]])[1]);
-	Add(subgridC, DMCGetBlocksContainingList(square, [subtransversal[3][1],subtransversal[3][2]])[1]);
+	Add(subgridC, GetBlocksContainingList(square, [subtransversal[3][1],subtransversal[1][2]])[1]);
+	Add(subgridC, GetBlocksContainingList(square, [subtransversal[3][1],subtransversal[2][2]])[1]);
+	Add(subgridC, GetBlocksContainingList(square, [subtransversal[3][1],subtransversal[3][2]])[1]);
 
-	possible_subgrids:=DMCMultisetDifference(Cartesian(subgridA,subgridB,subgridC), [subtransversal]);
+	possible_subgrids:=MultisetDifference(Cartesian(subgridA,subgridB,subgridC), [subtransversal]);
 	subgrids:=[];
 	t2:=ShallowCopy(transversal);
 
-	potentials:=DMCSort2(Flat(subtransversal));
+	potentials:=CopyAndSort(Flat(subtransversal));
 
 	for i in [1..Size(possible_subgrids)] do
 		flag:=true;
 		variable_flag:=transversal.v/3;
 		# check there is a cell in each row
 		for j in [1..Size(potentials)/3] do
-			if Size(DMCGetBlocksContainingListWithBlockList(possible_subgrids[i], [potentials[j]])) = 0 then
+			if Size(GetBlocksContainingListWithBlockList(possible_subgrids[i], [potentials[j]])) = 0 then
 				flag:=false;
 			fi;
 
-			if Size(DMCGetBlocksContainingListWithBlockList(possible_subgrids[i], [potentials[j+Size(potentials)/3]])) = 0 then
+			if Size(GetBlocksContainingListWithBlockList(possible_subgrids[i], [potentials[j+Size(potentials)/3]])) = 0 then
 				flag:=false;
 			fi;
 
 		od;
 		
 		t3:=ShallowCopy(t2);
-		t3.blocks:=Union(DMCMultisetDifference(t3.blocks, subtransversal), possible_subgrids[i]);
-		t3.blocks:=DMCSortListList(DMCListListMutableCopy(t3.blocks));
+		t3.blocks:=Union(MultisetDifference(t3.blocks, subtransversal), possible_subgrids[i]);
+		t3.blocks:=CopyAndSortListList(ListListMutableCopy(t3.blocks));
 		if flag=true and Size(Unique(Flat(t3.blocks)))+improper_match_distance >= transversal.v then
 			Add(subgrids, t3);
 		else
@@ -518,42 +544,42 @@ BindGlobal("HopTransversal3", function(square, transversal,numImps)
 		subgridB:=[];
 		subgridC:=[];
 
-		Add(subgridA, DMCGetBlocksContainingList(square, [subtransversal[1][1],subtransversal[1][2]])[1]);
-		Add(subgridA, DMCGetBlocksContainingList(square, [subtransversal[1][1],subtransversal[2][2]])[1]);
-		Add(subgridA, DMCGetBlocksContainingList(square, [subtransversal[1][1],subtransversal[3][2]])[1]);
+		Add(subgridA, GetBlocksContainingList(square, [subtransversal[1][1],subtransversal[1][2]])[1]);
+		Add(subgridA, GetBlocksContainingList(square, [subtransversal[1][1],subtransversal[2][2]])[1]);
+		Add(subgridA, GetBlocksContainingList(square, [subtransversal[1][1],subtransversal[3][2]])[1]);
 
-		Add(subgridB, DMCGetBlocksContainingList(square, [subtransversal[2][1],subtransversal[1][2]])[1]);
-		Add(subgridB, DMCGetBlocksContainingList(square, [subtransversal[2][1],subtransversal[2][2]])[1]);
-		Add(subgridB, DMCGetBlocksContainingList(square, [subtransversal[2][1],subtransversal[3][2]])[1]);
+		Add(subgridB, GetBlocksContainingList(square, [subtransversal[2][1],subtransversal[1][2]])[1]);
+		Add(subgridB, GetBlocksContainingList(square, [subtransversal[2][1],subtransversal[2][2]])[1]);
+		Add(subgridB, GetBlocksContainingList(square, [subtransversal[2][1],subtransversal[3][2]])[1]);
 
-		Add(subgridC, DMCGetBlocksContainingList(square, [subtransversal[3][1],subtransversal[1][2]])[1]);
-		Add(subgridC, DMCGetBlocksContainingList(square, [subtransversal[3][1],subtransversal[2][2]])[1]);
-		Add(subgridC, DMCGetBlocksContainingList(square, [subtransversal[3][1],subtransversal[3][2]])[1]);
+		Add(subgridC, GetBlocksContainingList(square, [subtransversal[3][1],subtransversal[1][2]])[1]);
+		Add(subgridC, GetBlocksContainingList(square, [subtransversal[3][1],subtransversal[2][2]])[1]);
+		Add(subgridC, GetBlocksContainingList(square, [subtransversal[3][1],subtransversal[3][2]])[1]);
 
-		possible_subgrids:=DMCMultisetDifference(Cartesian(subgridA,subgridB,subgridC), [subtransversal]);
+		possible_subgrids:=MultisetDifference(Cartesian(subgridA,subgridB,subgridC), [subtransversal]);
 		subgrids:=[];
 		t2:=ShallowCopy(transversal);
 
-		potentials:=DMCSort2(Flat(subtransversal));
+		potentials:=CopyAndSort(Flat(subtransversal));
 
 		for i in [1..Size(possible_subgrids)] do
 			flag:=true;
 			variable_flag:=transversal.v/3;
 			# check there is a cell in each row
 			for j in [1..Size(potentials)/3] do
-				if Size(DMCGetBlocksContainingListWithBlockList(possible_subgrids[i], [potentials[j]])) = 0 then
+				if Size(GetBlocksContainingListWithBlockList(possible_subgrids[i], [potentials[j]])) = 0 then
 					flag:=false;
 				fi;
 
-				if Size(DMCGetBlocksContainingListWithBlockList(possible_subgrids[i], [potentials[j+Size(potentials)/3]])) = 0 then
+				if Size(GetBlocksContainingListWithBlockList(possible_subgrids[i], [potentials[j+Size(potentials)/3]])) = 0 then
 					flag:=false;
 				fi;
 
 			od;
 		
 			t3:=ShallowCopy(t2);
-			t3.blocks:=Union(DMCMultisetDifference(t3.blocks, subtransversal), possible_subgrids[i]);
-			t3.blocks:=DMCSortListList(DMCListListMutableCopy(t3.blocks));
+			t3.blocks:=Union(MultisetDifference(t3.blocks, subtransversal), possible_subgrids[i]);
+			t3.blocks:=CopyAndSortListList(ListListMutableCopy(t3.blocks));
 			if flag=true and Size(Unique(Flat(t3.blocks)))+improper_match_distance >= transversal.v then
 				Add(all,t3);
 			else
@@ -576,7 +602,7 @@ end);
 
 BindGlobal("ScanTrans", function(square, transversal)
 	local found, total,t2;
-	total:=Size(DMCFindAllTransversals(square, 1));
+	total:=Size(FindAllTransversals(square, 1));
 	t2:=ShallowCopy(transversal);
 	found:=[t2];
 	Print("Total found = ",Size(found),"\n");
@@ -601,7 +627,7 @@ BindGlobal("ScanTrans2", function(square, transversal,numImps)
 	local found, total,t2,transversals_found,i;
 	i:=1;
 	if square.v < 40 then
-		total:=Size(DMCFindAllTransversals(square, 1));
+		total:=Size(FindAllTransversals(square, 1));
 	else 
 		total:="??";
 	fi;
@@ -628,11 +654,11 @@ BindGlobal("couple", function(x,y)
 	local m,x1,y1, coin1, coin2, coin3, pivot, removablesX, removablesY,i, row_choicesX, col_choicesX, sym_choicesX, row_choicesY, col_choicesY, sym_choicesY,pivotX,pivotY,d,k;
 	x1:=ShallowCopy(x);
 	y1:=ShallowCopy(y);
-	d:=Size(x.blocks) - Size(DMCMultisetIntersection(x1.blocks, y1.blocks));
+	d:=Size(x.blocks) - Size(MultisetIntersection(x1.blocks, y1.blocks));
 	m:=0;
 	while d>0 do
 		m:=m+1;
-		d:=Size(x.blocks) - Size(DMCMultisetIntersection(x1.blocks, y1.blocks));
+		d:=Size(x.blocks) - Size(MultisetIntersection(x1.blocks, y1.blocks));
 		Print(m,": matched ",Size(x.blocks)-d,"/",Size(x.blocks),"\t");
 		
 		for k in [1..Size(x.blocks)-d] do
@@ -662,8 +688,8 @@ BindGlobal("couple", function(x,y)
 			coin2:=Random([0,1]);
 			coin3:=Random([0,1]);
 			
-			removablesX:=DMCSortListList(RemovableBlocks(x1, x1.negatives[1]));
-			removablesY:=DMCSortListList(RemovableBlocks(y1, y1.negatives[1]));
+			removablesX:=CopyAndSortListList(RemovableBlocks(x1, x1.negatives[1]));
+			removablesY:=CopyAndSortListList(RemovableBlocks(y1, y1.negatives[1]));
 			
 			row_choicesX:=[];
 			col_choicesX:=[];
@@ -753,7 +779,7 @@ BindGlobal("HowOftenCanWeMove", function(B)
 	B2:=ShallowCopy(B);
 	while true do
 		B2:=ManyStepsProper(B2,5);;
-		transversals:=DMCFindAllTransversals(B2,1);
+		transversals:=FindAllTransversals(B2,1);
 		if Size(transversals) = 0 then
 			continue;
 		fi;
@@ -767,13 +793,13 @@ BindGlobal("HowOftenCanWeMove", function(B)
 	od;
 end);
 
-DMCCompleteLatinSquare:=function();end;
-BindGlobal("DMCCompleteLatinSquare", function(B)
+CompleteLatinSquare:=function();end;
+BindGlobal("CompleteLatinSquare", function(B)
 	local r,c,i,symbols, results,n,out;
 	results:=[];
 	r:=-1;
 	for i in [1..B.v/3] do
-		if Size(DMCGetBlocksContainingList(B, [i])) < B.v/3 then
+		if Size(GetBlocksContainingList(B, [i])) < B.v/3 then
 			r:=i;
 			break;
 		fi;
@@ -785,22 +811,22 @@ BindGlobal("DMCCompleteLatinSquare", function(B)
 	fi;
 	
 	for i in [B.v/3+1..2*B.v/3] do
-		if Size(DMCGetBlocksContainingList(B, [r,i])) = 0 then
+		if Size(GetBlocksContainingList(B, [r,i])) = 0 then
 			c:=i;
 			break;
 		fi;
 	od;
 	symbols:=[2*B.v/3+1..B.v];
 	for i in [2*B.v/3+1..B.v] do
-		if Size(DMCGetBlocksContainingList(B, [r,i]))>0 or Size(DMCGetBlocksContainingList(B, [c,i]))>0 then
-			symbols:=DMCMultisetDifference(symbols,[i]);
+		if Size(GetBlocksContainingList(B, [r,i]))>0 or Size(GetBlocksContainingList(B, [c,i]))>0 then
+			symbols:=MultisetDifference(symbols,[i]);
 		fi;
 	od;
 	
 	for i in Cartesian([r],[c],symbols) do
 		n:=BlockDesign(B.v, Union(B.blocks, [i]));
 		n.k:=[1,1,1];
-		Add(results,DMCCompleteLatinSquare(n));
+		Add(results,CompleteLatinSquare(n));
 	od;
 	return Unique(Flat(results));
 end);
@@ -809,7 +835,7 @@ BindGlobal("CreateLatinRectangle", function(B,k)
     local B2,ir;
     B2:=StructuralCopy(B);
 	for ir in [B2.vType[1]/k+1..B2.vType[1]] do
-		B2.blocks:=DMCMultisetDifference(B2.blocks, DMCGetBlocksContainingList(B2,[ir]));
+		B2.blocks:=MultisetDifference(B2.blocks, GetBlocksContainingList(B2,[ir]));
 	od;
 	B2.vType[1]:=B2.vType[1]/k;
 	return B2;
@@ -827,7 +853,7 @@ BindGlobal("DecomposeLR", function(B)
 			#Print("Entering for loop with i = ",i,"\n");
 			cell:=[];
 			#get all the blocks in this row
-			possibilities:=DMCGetBlocksContainingList(B2, [i]);
+			possibilities:=GetBlocksContainingList(B2, [i]);
 			#Print("\tpossibilities = ",possibilities,"\n");
 			k:=0;
 			while true do
@@ -845,9 +871,9 @@ BindGlobal("DecomposeLR", function(B)
 			od;
 			Add(transversal,cell);
 		od;
-		transversal:=DMCSortListList(transversal);
+		transversal:=CopyAndSortListList(transversal);
 		Add(transversals, transversal);
-		B2.blocks:=DMCMultisetDifference(B2.blocks, transversal);
+		B2.blocks:=MultisetDifference(B2.blocks, transversal);
 	od;
 	return transversals;
 end);
@@ -858,7 +884,7 @@ BindGlobal("FindFullDecomposition", function(B)
 	i:=0;
 	while true do
 		i:=i+1;
-		#DMCShowProgressIndicator(i);
+		#ShowProgressIndicator(i);
 		d:=DecomposeLR(B2);
 		if(Size(d) = B2.vType[2]) then
 			Print("\n");
@@ -873,14 +899,14 @@ BindGlobal("FindNearDecomposition", function(B)
 	i:=0;
 	while true do
 		i:=i+1;
-		#DMCShowProgressIndicator(i);
+		#ShowProgressIndicator(i);
 		d:=DecomposeLR(B2);
 		if(Size(d) = B2.vType[2]-1) then
 			return d;
 		fi;
 		if(Size(d) = B2.vType[2]) then
 			random:=Random(d);
-			return DMCMultisetDifference(d, [random]);
+			return MultisetDifference(d, [random]);
 		fi;
 		
 	od;
@@ -892,7 +918,7 @@ BindGlobal("FindNearNearDecomposition", function(B)
 	i:=0;
 	while true do
 		i:=i+1;
-		#DMCShowProgressIndicator(i);
+		#ShowProgressIndicator(i);
 		d:=DecomposeLR(B2);
 		if(Size(d) = B2.vType[2]-2) then
 			return d;
@@ -906,12 +932,12 @@ BindGlobal("FindMNearDecomposition", function(B,m)
 	i:=0;
 	while true do
 		i:=i+1;
-		#DMCShowProgressIndicator(i);
+		#ShowProgressIndicator(i);
 		d:=DecomposeLR(B2);
 		if(Size(d) >= B2.vType[2]-m) then
 			while Size(d) > B2.vType[2]-m do
 				random:=Random(d);
-				d:=DMCRemoveElement(d, random);
+				d:=RemoveElement(d, random);
 			od;
 			return d;
 		fi;		
@@ -920,11 +946,11 @@ end);
 
 BindGlobal("DecompositionSearch", function(n)
 	local S,D,i;
-	S:=DMCLatinSquareMake(n, 1);
+	S:=LatinSquareMake(n, 1);
 	i:=0;
 	while true do
 		i:=i+1;
-		Print("\n\n\n------------------------------------\nIteration ",i,": ",DMCTimeHuman(),"\n------------------------------------\n\nGenerating new square...\n\n");
+		Print("\n\n\n------------------------------------\nIteration ",i,": ",TimeHuman(),"\n------------------------------------\n\nGenerating new square...\n\n");
 		D:=StructuralCopy(S);
 		D:=CreateLatinRectangle(D,2);
 		Print(D,"\n\nFinding decomposition...\c");
@@ -939,10 +965,10 @@ BindGlobal("UncoveredCells", function(B, transversalDecomposition,row)
 	columns_uncovered:=[B.vType[2]+1..2*B.vType[2]];
 	# for now, we always use row 1.
 	for transversal in transversalDecomposition do
-		cell:=DMCGetBlocksContainingListWithBlockList(transversal, [row])[1];
-		columns_uncovered:=DMCRemoveElement(columns_uncovered, cell[2]);
+		cell:=GetBlocksContainingListWithBlockList(transversal, [row])[1];
+		columns_uncovered:=RemoveElement(columns_uncovered, cell[2]);
 	od;
-	return DMCGetBlocksContainingList(B, [row, Random(columns_uncovered)]);
+	return GetBlocksContainingList(B, [row, Random(columns_uncovered)]);
 end);
 
 BindGlobal("AllUncoveredCells", function(B, transversalDecomposition)
@@ -960,27 +986,27 @@ BindGlobal("JengaMove", function(B, transversalDecomposition,r)
 	# for now, we always use row 1.
 	
 	cell_to_cover:=Random(UncoveredCells(B, transversalDecomposition, r));
-	cells_in_selected_column:=DMCGetBlocksContainingList(B, [cell_to_cover[2]]);
+	cells_in_selected_column:=GetBlocksContainingList(B, [cell_to_cover[2]]);
 	possibilities:=ShallowCopy(transversalDecomposition);
 	for cell in cells_in_selected_column do
 		for transversal in transversalDecomposition do
 			if cell in transversal then
-				possibilities:=DMCRemoveElement(possibilities, transversal);
+				possibilities:=RemoveElement(possibilities, transversal);
 			fi;
 		od;
 	od;
 	for transversal in transversalDecomposition do
 		for cell in transversal do
 			if cell_to_cover[3] in cell then
-				possibilities:=DMCRemoveElement(possibilities, transversal);
+				possibilities:=RemoveElement(possibilities, transversal);
 			fi;
 		od;
 	od;
 	chosen_trans:=Random(possibilities);
-	cell_to_uncover:=DMCGetBlocksContainingListWithBlockList(chosen_trans, [r])[1];
+	cell_to_uncover:=GetBlocksContainingListWithBlockList(chosen_trans, [r])[1];
 	
-	new_trans:=Union(DMCMultisetDifference(chosen_trans,[cell_to_uncover]), [cell_to_cover]);
-	new_transversal_decomposition:=Union(DMCMultisetDifference(transversalDecomposition,[chosen_trans]), [new_trans]);
+	new_trans:=Union(MultisetDifference(chosen_trans,[cell_to_uncover]), [cell_to_cover]);
+	new_transversal_decomposition:=Union(MultisetDifference(transversalDecomposition,[chosen_trans]), [new_trans]);
 	
 	#Print("Uncovered cells in row ",r,": ",UncoveredCells(B, transversalDecomposition, r),"\n");
 	#Print("Current TD: ",transversalDecomposition,"\n");
@@ -995,7 +1021,7 @@ BindGlobal("JengaHitTest", function(B, transversalDecomposition,rows)
 	newTD:=ShallowCopy(transversalDecomposition);
 	unseen_cells:=ShallowCopy(B.blocks);
 	#uncovered_cell:=UncoveredCell(B, newTD,row);
-	#unseen_cells:=DMCRemoveElement(unseen_cells, uncovered_cell);
+	#unseen_cells:=RemoveElement(unseen_cells, uncovered_cell);
 	uhoh:=0;
 
 	# set the rows to search.
@@ -1004,7 +1030,7 @@ BindGlobal("JengaHitTest", function(B, transversalDecomposition,rows)
 	
 	while Size(unseen_cells) > 0 do
 		uhoh:=uhoh+1;
-		#DMCShowProgressIndicator(uhoh);
+		#ShowProgressIndicator(uhoh);
 		if (uhoh mod 10000) = 0 then
 			Print("\nI might be stuck (unseen = ",unseen_cells,"). Uncovered cells: ",AllUncoveredCells(B, newTD),"...\c");
 			if Size(Unique(Flat(AllUncoveredCells(B, newTD)))) = 3*Size(AllUncoveredCells(B, newTD)) then
@@ -1014,9 +1040,9 @@ BindGlobal("JengaHitTest", function(B, transversalDecomposition,rows)
 		fi;
 		
 		# remove any blocks that are outside the allowed rows
-		ignored_rows:=DMCMultisetDifference([1..B.vType[1]], row_list);
+		ignored_rows:=MultisetDifference([1..B.vType[1]], row_list);
 		for i2 in ignored_rows do
-			unseen_cells:=DMCMultisetDifference(unseen_cells, DMCGetBlocksContainingList(B, [i2]));
+			unseen_cells:=MultisetDifference(unseen_cells, GetBlocksContainingList(B, [i2]));
 		od;
 		
 		#for row in row_list do
@@ -1025,7 +1051,7 @@ BindGlobal("JengaHitTest", function(B, transversalDecomposition,rows)
 			newTD:=JengaMove(B, newTD,row);
 			#Print(".... and now I'm at: ",Random(UncoveredCells(B, newTD, row)),"\n");
 			for i in UncoveredCells(B, newTD,row) do
-				unseen_cells:=DMCRemoveElement(unseen_cells, i);
+				unseen_cells:=RemoveElement(unseen_cells, i);
 			od;
 		#od;
 	od;
@@ -1034,17 +1060,17 @@ end);
 BindGlobal("FindBadJenga", function(n,k,howNear)
 	# this makes an n by n/k latin rectangle.
 	local B, TD, LR,i,rows,r;
-	B:=DMCLatinSquareMake(n, 1);	
+	B:=LatinSquareMake(n, 1);	
 	B:=ManyStepsProper(B, 30);
 	i:=0;
 	while true do
 		i:=i+1;
-		Print("\n\n\n------------------------------------\nIteration ",i,": ",DMCTimeHuman(),"\n------------------------------------\nGenerating new Latin rectangle of order ",n,"...\n");
+		Print("\n\n\n------------------------------------\nIteration ",i,": ",TimeHuman(),"\n------------------------------------\nGenerating new Latin rectangle of order ",n,"...\n");
 		B:=ManyStepsProper(B, 30);
 		LR:=ShallowCopy(B);
 		LR:=CreateLatinRectangle(LR,k);
 		#rows := [1..LR.vType[1]];
-		DMCPrintDesign(LR);
+		PrintDesign(LR);
 		Print("\n",LR,"\nFinding near transversal decomposition...\n\n");
 		#TD:=FindNearNearDecomposition(LR);
 		#TD:=FindNearDecomposition(LR);

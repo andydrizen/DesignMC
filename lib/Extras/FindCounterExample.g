@@ -3,12 +3,15 @@
 #                                                                   15/02/2011
 # File overview:
 # 
-# DMCFindCounterExample will help you find designs that do not satisfy the 
+# FindCounterExample will help you find designs that do not satisfy the 
 # counterExampleWillFailFunction
+#
+# FindCounterExample
+# HasTransversal
 #
 ################################################################################
 
-BindGlobal("DMCFindCounterExample",function( D, counterExampleWillFailFunction )
+BindGlobal("FindCounterExample",function( D, counterExampleWillFailFunction )
 	local D2, numberScanned;
 	D2:=ShallowCopy(D);
 
@@ -23,13 +26,13 @@ BindGlobal("DMCFindCounterExample",function( D, counterExampleWillFailFunction )
 		if(counterExampleWillFailFunction(D2) = false) then
 			return [D2];
 		fi;
-		DMCShowProgressIndicator(numberScanned);
+		ShowProgressIndicator(numberScanned);
 	od;
 	return [];
 end);
 
-# BindGlobal("DMCHasTransversal", function(D)
-# 	if(Size(DMCFindTransversal(D, D.tSubsetStructure.lambdas[1]))>0) then
+# BindGlobal("HasTransversal", function(D)
+# 	if(Size(FindTransversal(D, D.tSubsetStructure.lambdas[1]))>0) then
 # 		return true;
 # 	else
 # 		return false;

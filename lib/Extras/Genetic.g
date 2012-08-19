@@ -3,21 +3,28 @@
 #                                                                   25/02/2011
 # File overview:
 # 
-# DMCBeginEvolution on a design D for a property that you want o optimise.
+# BeginEvolution on a design D for a property that you want o optimise.
 #
+# CreatePopulation
+# JudgePopulation
+# MutateCitizen
+# MateCitizens
+# BreedNewPopulationFromWinners
+# BeginEvolution
+# 
 ################################################################################
 
-BindGlobal("DMCCreatePopulation",function(D, population_size)
+BindGlobal("CreatePopulation",function(D, population_size)
 	local population,i;
 	population:=[];
 	for i in [1..population_size] do
-		DMCShowProgressIndicator(i);
+		ShowProgressIndicator(i);
 		Add(population, ManyStepsProper(D, 10));
 	od;
 	return population;
 end);
 
-BindGlobal("DMCJudgePopulation",function(population, criterion)
+BindGlobal("JudgePopulation",function(population, criterion)
 	local winners, assessment,i;
 	winners:=[];
 	assessment:=[];
@@ -32,33 +39,33 @@ BindGlobal("DMCJudgePopulation",function(population, criterion)
 	return winners;
 end);
 
-BindGlobal("DMCMutateCitizen",function(citizen)
+BindGlobal("MutateCitizen",function(citizen)
 	#if Random([0,1]) = 0 then
 		citizen:=ManyStepsProper(citizen, 1);
 	#fi;
 	return citizen;
 end);
 
-BindGlobal("DMCMateCitizens",function(mother, father)
+BindGlobal("MateCitizens",function(mother, father)
 	local child;
 	child:=ShallowCopy(mother[2]);
 	return child;
 end);
 
-BindGlobal("DMCBreedNewPopulationFromWinners",function(population_size, winners)
+BindGlobal("BreedNewPopulationFromWinners",function(population_size, winners)
 	local population, mother, father, child;
 	population:=[];
 	while Size(population)<population_size do
 		mother:=Random(winners);
 		father:=Random(winners);
-		child:=DMCMateCitizens(mother, father);
-		child:=DMCMutateCitizen(child);
+		child:=MateCitizens(mother, father);
+		child:=MutateCitizen(child);
 		Add(population, child);
 	od;
 	return population;
 end);
 
-BindGlobal("DMCBeginEvolution",function(D, population_size, criterion_to_optimise, ShouldMaximise)
+BindGlobal("BeginEvolution",function(D, population_size, criterion_to_optimise, ShouldMaximise)
 	local population, winners, best_so_far,k;
 	if ShouldMaximise then
 		k:=0;
@@ -67,10 +74,10 @@ BindGlobal("DMCBeginEvolution",function(D, population_size, criterion_to_optimis
 	fi;
 	best_so_far:=rec(design:=[], criterion_value:=k);
 	Print("Spawning intial population...");
-	population:=DMCCreatePopulation(D, population_size);
+	population:=CreatePopulation(D, population_size);
 	Print("\n..done!\n");
 	while true do
-		winners:=DMCJudgePopulation(population, criterion_to_optimise);
+		winners:=JudgePopulation(population, criterion_to_optimise);
 		if (ShouldMaximise and winners[1][1] > best_so_far.criterion_value) or ((not ShouldMaximise) and winners[1][1] < best_so_far.criterion_value) then
 			Print("We've found a new best citizen!\n",winners[1][2],"\n\nCriterion Value: ",winners[1][1],"\n---------------------\n\n");
 			best_so_far.criterion_value:=winners[1][1];
@@ -78,6 +85,6 @@ BindGlobal("DMCBeginEvolution",function(D, population_size, criterion_to_optimis
 		else
 			#Print("nothing of note in this generation (best was only ",winners[1][1],")\n");
 		fi;
-		population:=DMCBreedNewPopulationFromWinners(population_size, winners);
+		population:=BreedNewPopulationFromWinners(population_size, winners);
 	od;
 end);

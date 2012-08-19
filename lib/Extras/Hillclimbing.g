@@ -6,9 +6,12 @@
 # Two functions for hillclimbing using Stinson's method. First function is for
 # proper STSs, the second function is for improper STSs.
 #
+# StinsonProper
+# StinsonImproper
+#
 ################################################################################
 
-BindGlobal("DMCStinsonProper",function(n)
+BindGlobal("StinsonProper",function(n)
 	local B,i,livepoints,x,y,z,w,livepairs,livepairs2,j;
 	B:=rec(v:=n, blocks:=[]);
 	while Size(B.blocks) < n*(n-1)/6 do
@@ -43,26 +46,26 @@ BindGlobal("DMCStinsonProper",function(n)
 				Add(livepairs2, i);
 			fi;
 		od;
-		y:=DMCMultisetDifference(Random(livepairs2), [x])[1];
-		z:=DMCMultisetDifference(Random(DMCMultisetDifference(livepairs2, [DMCSort2([y,x])])), [x])[1];
-		if DMCSort2([y,z]) in livepairs then
-			Add(B.blocks, DMCSort2([x,y,z]));
+		y:=MultisetDifference(Random(livepairs2), [x])[1];
+		z:=MultisetDifference(Random(MultisetDifference(livepairs2, [CopyAndSort([y,x])])), [x])[1];
+		if CopyAndSort([y,z]) in livepairs then
+			Add(B.blocks, CopyAndSort([x,y,z]));
 		else 
 			for i in B.blocks do
-				if Size(DMCMultisetIntersection(DMCSort2([y,z]), i))=2 then
-					w:=DMCMultisetDifference(i, DMCSort2([y,z]))[1];
-					B.blocks:=DMCMultisetDifference(B.blocks, [DMCSort2([w,y,z])]);
+				if Size(MultisetIntersection(CopyAndSort([y,z]), i))=2 then
+					w:=MultisetDifference(i, CopyAndSort([y,z]))[1];
+					B.blocks:=MultisetDifference(B.blocks, [CopyAndSort([w,y,z])]);
 					#Error();
-					Add(B.blocks, DMCSort2([x,y,z]));
+					Add(B.blocks, CopyAndSort([x,y,z]));
 					break;
 				fi;
 			od;
 		fi;
 	od;
-	return BlockDesign(B.v, DMCSortListList(B.blocks));
+	return BlockDesign(B.v, CopyAndSortListList(B.blocks));
 end);
 
-BindGlobal("DMCStinsonImproper",function(n)
+BindGlobal("StinsonImproper",function(n)
 	local B,i,livepoints,x,y,z,w,livepairs,oldblocks,livepairs2,j,B2,resetLimit;
 	B:=rec(v:=n, blocks:=[]);oldblocks:=0;resetLimit:=0;
 	while Size(B.blocks) < n*(n-1)/6+1 do
@@ -95,7 +98,7 @@ BindGlobal("DMCStinsonImproper",function(n)
 		for i in B.blocks do
 			for j in Combinations([1..n], 2) do
 				if j[1] in i and j[2] in i then
-					livepairs := DMCMultisetDifference( livepairs, [j] );
+					livepairs := MultisetDifference( livepairs, [j] );
 				fi;
 			od;
 		od;
@@ -106,18 +109,18 @@ BindGlobal("DMCStinsonImproper",function(n)
 				Add(livepairs2, i);
 			fi;
 		od;
-		y:=DMCMultisetDifference(Random(livepairs2), [x])[1];
-		z:=DMCMultisetDifference(Random(DMCMultisetDifference(livepairs2, [DMCSort2([y,x])])), [x])[1];
-		if DMCSort2([y,z]) in livepairs and ( not DMCSort2([x,y,z]) = [1,2,3]) then
-			Add(B.blocks, DMCSort2([x,y,z]));
+		y:=MultisetDifference(Random(livepairs2), [x])[1];
+		z:=MultisetDifference(Random(MultisetDifference(livepairs2, [CopyAndSort([y,x])])), [x])[1];
+		if CopyAndSort([y,z]) in livepairs and ( not CopyAndSort([x,y,z]) = [1,2,3]) then
+			Add(B.blocks, CopyAndSort([x,y,z]));
 		else 
 			for i in B.blocks do
-				if Size(DMCMultisetIntersection(DMCSort2([y,z]), i))=2 then
-					w:=DMCMultisetDifference(i, DMCSort2([y,z]))[1];
-					B.blocks:=DMCMultisetDifference(B.blocks, [DMCSort2([w,y,z])]);
+				if Size(MultisetIntersection(CopyAndSort([y,z]), i))=2 then
+					w:=MultisetDifference(i, CopyAndSort([y,z]))[1];
+					B.blocks:=MultisetDifference(B.blocks, [CopyAndSort([w,y,z])]);
 					#Error();
-					if(not DMCSort2([x,y,z]) = [1,2,3]) then
-						Add(B.blocks, DMCSort2([x,y,z]));
+					if(not CopyAndSort([x,y,z]) = [1,2,3]) then
+						Add(B.blocks, CopyAndSort([x,y,z]));
 						break;
 					fi;
 				fi;
@@ -140,7 +143,7 @@ BindGlobal("DMCStinsonImproper",function(n)
 	for j in [1..Length(DigitsNumber(n*(n-1)/6+1,10))+21 ] do 
 		Print("\b");
 	od;
-	B2:=BlockDesign(B.v, DMCSortListList(B.blocks));
+	B2:=BlockDesign(B.v, CopyAndSortListList(B.blocks));
 	B2.Improper:= true;B2.Pivot:=[1,2,3];
 	return B2;	
 end);

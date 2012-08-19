@@ -24,7 +24,7 @@
 # 
 # A third (and hopefully self-explanatory function), FindAllAlternatingTrails
 #
-# DMCComponentsOfGraph: 'B' is a 2-design (|K|=3) and 'pointsList' is list of points. 
+# ComponentsOfGraph: 'B' is a 2-design (|K|=3) and 'pointsList' is list of points. 
 # Construct a graph 'G' by forming an edge [x,y] if [x,y,a] is a block of 'B' and 'a' 
 # is in pointsList. This function returns the number of points seen from a random 
 # starting location. For pair graphs, you can check whether the red/blue 
@@ -34,6 +34,17 @@
 #
 # ScanForBridgedDG: Search MC to find designs with the property that the subgraph 
 # created by deleted a blue edge between the ``special vertices'' is disconnected.
+# 
+# CreatePairGraph
+# FindAlternatingTrail
+# FindAlternatingTrailWithoutGivenBlueEdge
+# FindAllAlternatingTrails
+# ComponentsOfGraph
+# IsChordedDG
+# ScanForBridgedDG
+# SamePairGraphs
+# FindNonIsoDesignsWithIsoGraph
+# FindNonIsoDesignsWithIsoGraphUsingList
 # 
 ################################################################################
 
@@ -45,17 +56,17 @@ BindGlobal("CreatePairGraph",function(D1,p1_red, D2,p2_blue)
 	mystring:="g={";
 
 	# first point 
-	list1:=DMCGetBlocksContainingList(D1, [p1_red]);
+	list1:=GetBlocksContainingList(D1, [p1_red]);
 	for i in [1..Size(list1)] do
-		j:=DMCMultisetDifference(list1[i], [p1_red]);
+		j:=MultisetDifference(list1[i], [p1_red]);
 		temp:=Concatenation("{\"",String(j[1]),"\"->\"",String(j[2]),"\", \"D1-",String(p1_red),"\"},\n");
 		mystring:=Concatenation(mystring,temp);
 	od;
 	
 	# second point 
-	list1:=DMCGetBlocksContainingList(D2, [p2_blue]);
+	list1:=GetBlocksContainingList(D2, [p2_blue]);
 	for i in [1..Size(list1)] do
-		j:=DMCMultisetDifference(list1[i], [p2_blue]);
+		j:=MultisetDifference(list1[i], [p2_blue]);
 		temp:=Concatenation("{\"",String(j[1]),"\"->\"",String(j[2]),"\", \"D2-",String(p2_blue),"\"}");
 		mystring:=Concatenation(mystring,temp);
 		if not i = Size(list1) then
@@ -78,11 +89,10 @@ BindGlobal("CreatePairGraph",function(D1,p1_red, D2,p2_blue)
 	
 end);
 
-
 BindGlobal("FindAlternatingTrail",function(B, starting_vertex, finishing_vertex, IsPathEvenLength, edgeColour1, edgeColour2, include_edge_lists, forbidden_edge_list)
 	local path,onColour,choice,j, visited_blocks, checks,tmpblock,blockCopy,tmpblock2,p;
 	checks:=0;
-	blockCopy:=DMCListListMutableCopy(B.blocks);
+	blockCopy:=ListListMutableCopy(B.blocks);
 	visited_blocks:=[];
 	if B.improper = false then
 		Print("This is for improper designs only.\n");
@@ -107,14 +117,14 @@ or tmpblock in Combinations(tmpblock2,3) then
 					# If we find a block that is disallowed because of something in the fobidden edge list, remove both the block from the block list and the fobidden edge from the forbidden edge list. This means if you want to prevent ALL, say, blue edges from point 1, you need to include q after this: 
 					#q:=[]; for i in [1..10] do Add(q, [1,2]); od;
 
-					blockCopy:=DMCMultisetDifference(blockCopy,[tmpblock2]);
-					forbidden_edge_list:=DMCMultisetDifference(forbidden_edge_list, [tmpblock]);
+					blockCopy:=MultisetDifference(blockCopy,[tmpblock2]);
+					forbidden_edge_list:=MultisetDifference(forbidden_edge_list, [tmpblock]);
 				fi;
 			od;
 		od;
 		while j = 0 do
 			j:=1;
-			choice:=Random(DMCGetBlocksContainingListWithBlockList(blockCopy, [path[Size(path)], onColour]));
+			choice:=Random(GetBlocksContainingListWithBlockList(blockCopy, [path[Size(path)], onColour]));
 
 			if choice=fail then
 				# we're stuck, try again.
@@ -122,14 +132,14 @@ or tmpblock in Combinations(tmpblock2,3) then
 				Print(p,": Stuck - restarting...\n");
 				
 				path:=[starting_vertex];
-				blockCopy:=DMCListListMutableCopy(B.blocks);
+				blockCopy:=ListListMutableCopy(B.blocks);
 				visited_blocks:=[];
 			else
-				choice:=DMCMultisetDifference(choice, [path[Size(path)], onColour])[1];
+				choice:=MultisetDifference(choice, [path[Size(path)], onColour])[1];
 				
 				if j = 1 then
-					blockCopy:=DMCMultisetDifference(blockCopy,[DMCSort2([choice,path[Size(path)],onColour]) ]);
-					Add(visited_blocks, DMCSort2([choice,path[Size(path)],onColour]));
+					blockCopy:=MultisetDifference(blockCopy,[CopyAndSort([choice,path[Size(path)],onColour]) ]);
+					Add(visited_blocks, CopyAndSort([choice,path[Size(path)],onColour]));
 					Add(path, choice);
 				fi;
 			fi;
@@ -140,7 +150,7 @@ or tmpblock in Combinations(tmpblock2,3) then
 
 		checks:=1;
 		for tmpblock in include_edge_lists do
-			if Size(DMCGetBlocksContainingListWithBlockList(visited_blocks, tmpblock))=0 then
+			if Size(GetBlocksContainingListWithBlockList(visited_blocks, tmpblock))=0 then
 				checks:=0;
 				break;
 			fi;
@@ -149,7 +159,6 @@ or tmpblock in Combinations(tmpblock2,3) then
 
 	return path;
 end);
-
 
 BindGlobal("FindAlternatingTrailWithoutGivenBlueEdge",function(lf)
 	local pivot,edgeColours,badBlue,tmp,tmp2,a,b,c;
@@ -165,10 +174,10 @@ BindGlobal("FindAlternatingTrailWithoutGivenBlueEdge",function(lf)
 		fi;
 	od;
 
-	pivot:=[DMCMultisetDifference(lf.negatives[1], edgeColours), Reversed(DMCMultisetDifference(lf.negatives[1], edgeColours))];
+	pivot:=[MultisetDifference(lf.negatives[1], edgeColours), Reversed(MultisetDifference(lf.negatives[1], edgeColours))];
 	for a in edgeColours do
 		for b in pivot do
-			badBlue:=DMCGetBlocksContainingList(lf, [a[2],b[1]]);
+			badBlue:=GetBlocksContainingList(lf, [a[2],b[1]]);
 			for c in badBlue do
 				Print("\npiv1: ", b[1], ", piv2: ",b[2],", ed1: ",a[1],", ed2: ",a[2],", badBlue:",c,"\n");
 				Print(FindAlternatingTrail(lf, b[1], b[2], 1, a[1], a[2], [], [c]),"\n");
@@ -187,7 +196,7 @@ BindGlobal("FindAllAlternatingTrails", function(ImpD, startingPoint, endingPoint
 	# put them all in a multi-dimensional array and work on them one at a time
 
 	if (not ImpD.k = [2,1]) or Size(ImpD.negatives)=0 then
-		Print("This function is for DMCImproperLambdaFactorisationMake(n,l) only.\n");
+		Print("This function is for MakeImproperLambdaFactorisation(n,l) only.\n");
 		return;
 	fi;
 	
@@ -195,18 +204,18 @@ BindGlobal("FindAllAlternatingTrails", function(ImpD, startingPoint, endingPoint
 	colours:=[startingColour, otherColour];
 	if depth = 0 then
 		tmpneg:=ShallowCopy(ImpD.negatives);
-		ImpD := BlockDesign(ImpD.v, DMCMultisetDifference(ImpD.blocks, DMCSortListList(bannedEdgesList)));
+		ImpD := BlockDesign(ImpD.v, MultisetDifference(ImpD.blocks, CopyAndSortListList(bannedEdgesList)));
 		ImpD.k := [2,1];
 		ImpD.negatives:=tmpneg;
 	fi;
-	neighbours_of_vertex:=DMCGetBlocksContainingList(ImpD, [startingPoint, startingColour]);
+	neighbours_of_vertex:=GetBlocksContainingList(ImpD, [startingPoint, startingColour]);
 	for i in neighbours_of_vertex do
 		if (endingPoint in i and not startingPoint=endingPoint and colours[(depth mod 2)+1] in i) then
 			count:=count+1;
 		else
-			next_vertex := DMCMultisetDifference(i, [startingPoint, startingColour])[1];
+			next_vertex := MultisetDifference(i, [startingPoint, startingColour])[1];
 			tmpneg:=ShallowCopy(ImpD.negatives);
-			newD:=BlockDesign(ImpD.v, DMCMultisetDifference(ImpD.blocks, [i]));
+			newD:=BlockDesign(ImpD.v, MultisetDifference(ImpD.blocks, [i]));
 
 			newD.k := [2,1];
 			newD.negatives:=tmpneg;
@@ -218,10 +227,10 @@ BindGlobal("FindAllAlternatingTrails", function(ImpD, startingPoint, endingPoint
 	return count;
 end);
 
-BindGlobal("DMCComponentsOfGraph",function(B, pointsList)
+BindGlobal("ComponentsOfGraph",function(B, pointsList)
 	local B2, blocksTmp, blocks, i, j, points_seen, start_from_block, o, start_from_point, blocks_seen, tmp_block, blocks_to_scan,grand_seen, grand_blocks_seen,i2;
 	B2:=ShallowCopy(B);
-	blocksTmp:=DMCListListMutableCopy(B2.blocks);
+	blocksTmp:=ListListMutableCopy(B2.blocks);
 	blocks:=[];
 	for i in blocksTmp do
 		if Size(Intersection(pointsList, i))=1 then
@@ -234,7 +243,7 @@ BindGlobal("DMCComponentsOfGraph",function(B, pointsList)
 		fi;
 	od;
 
-	blocks:=DMCGetBlocksContainingListWithBlockList(blocks,[pointsList[1]]);
+	blocks:=GetBlocksContainingListWithBlockList(blocks,[pointsList[1]]);
 	grand_seen:=[];
 	grand_blocks_seen:=[];
 	
@@ -253,10 +262,10 @@ BindGlobal("DMCComponentsOfGraph",function(B, pointsList)
 
 			# Remove the block we're scanning
 
-			blocks_to_scan:=DMCMultisetDifference(blocks_to_scan, [start_from_block]);
+			blocks_to_scan:=MultisetDifference(blocks_to_scan, [start_from_block]);
 		
 			for o in [1,2] do
-				start_from_point:=DMCMultisetDifference(start_from_block, [pointsList[1]])[o];
+				start_from_point:=MultisetDifference(start_from_block, [pointsList[1]])[o];
 
 				# Record that we've seen this block and this point
 
@@ -264,7 +273,7 @@ BindGlobal("DMCComponentsOfGraph",function(B, pointsList)
 				
 
 				i:=1;		
-				tmp_block:=DMCGetBlocksContainingListWithBlockList(blocks,[pointsList[1],start_from_point]);
+				tmp_block:=GetBlocksContainingListWithBlockList(blocks,[pointsList[1],start_from_point]);
 
 				while i<=Size(tmp_block) do
 					if not tmp_block[i] in blocks_seen and not tmp_block[i] in blocks_to_scan then
@@ -277,7 +286,7 @@ BindGlobal("DMCComponentsOfGraph",function(B, pointsList)
 		od;
 		Add(grand_seen, Unique(points_seen));
 		Add(grand_blocks_seen, blocks_seen);
-		blocks:=DMCMultisetDifference(blocks, blocks_seen);
+		blocks:=MultisetDifference(blocks, blocks_seen);
 	od;
 
 	return Unique(grand_blocks_seen);
@@ -287,26 +296,25 @@ BindGlobal("IsChordedDG",function(B,pointsList)
 	local col,blocks,block_to_remove,a,b;
 	a:=pointsList[1];
 	b:=pointsList[2];
-	col:=DMCMultisetDifference(DMCSort2([a,b]), DMCMultisetIntersection(B.negatives[1],DMCSort2(pointsList)))[1];
-	blocks:=DMCListListMutableCopy(B.blocks);
-	block_to_remove:=DMCMultisetDifference(B.negatives[1], DMCMultisetIntersection(B.negatives[1],DMCSort2(pointsList)));
+	col:=MultisetDifference(CopyAndSort([a,b]), MultisetIntersection(B.negatives[1],CopyAndSort(pointsList)))[1];
+	blocks:=ListListMutableCopy(B.blocks);
+	block_to_remove:=MultisetDifference(B.negatives[1], MultisetIntersection(B.negatives[1],CopyAndSort(pointsList)));
 	Add(block_to_remove, col);
-	blocks:=DMCMultisetDifference(blocks, [DMCSort2(block_to_remove)]);
-	return Size(DMCComponentsOfGraph(BlockDesign(B.v, DMCSortListList(blocks)), [a,b])) = Size(DMCComponentsOfGraph(B, [a,b])) ;
+	blocks:=MultisetDifference(blocks, [CopyAndSort(block_to_remove)]);
+	return Size(ComponentsOfGraph(BlockDesign(B.v, CopyAndSortListList(blocks)), [a,b])) = Size(ComponentsOfGraph(B, [a,b])) ;
 end);
-
 
 BindGlobal("ScanForBridgedDG",function(v)
 	local B,found,flag,i,res,j,it,galf,found_non_iso;
 	Print("Generating design...\n");
-	B:=DMCImproperTripleSystemMake(v,1);
+	B:=MakeImproperTripleSystem(v,1);
 	found:=[];it:=0;found_non_iso:=[];
 	Print("Searching...\n");
 	while true do
 		it:=it+1;
 
 		flag:=1;j:=0;
-		for i in DMCGetSpecialBlocksForImproperDesign(B) do
+		for i in GetSpecialBlocksForImproperDesign(B) do
 			j:=j+1;
 			res:=IsChordedDG(B,i);
 			if res then
@@ -329,7 +337,7 @@ BindGlobal("ScanForBridgedDG",function(v)
 		fi;
 		B:=ManyStepsImproper(B, 1);
 
-		DMCShowProgressIndicator(it);
+		ShowProgressIndicator(it);
 		
 	od;
 end);
@@ -339,23 +347,23 @@ BindGlobal("SamePairGraphs", function(B1, B2)
 
 	g1_list:=[];
 	for i in Combinations([1..B1.v], 2) do
-		g1:=DMCComponentsOfGraph(B1, i);
+		g1:=ComponentsOfGraph(B1, i);
 		Add(g1_list, List(g1, x->Size(x)));
 	od;
 
 	g2_list:=[];
 	for i in Combinations([1..B2.v], 2) do
-		g2:=DMCComponentsOfGraph(B2, i);
+		g2:=ComponentsOfGraph(B2, i);
 		Add(g2_list, List(g2, x->Size(x)));
 	od;
 
-	return DMCSortListList(g1_list) = DMCSortListList(g2_list);
+	return CopyAndSortListList(g1_list) = CopyAndSortListList(g2_list);
 end);
 
 BindGlobal("FindNonIsoDesignsWithIsoGraph", function( v )
 	local D1, D2, numberScanned;
 
-	D1:=DMCTripleSystemMake(v,1);
+	D1:=MakeTripleSystem(v,1);
 	D2:=ShallowCopy(D1);
 
 	numberScanned:=0;
@@ -368,7 +376,7 @@ BindGlobal("FindNonIsoDesignsWithIsoGraph", function( v )
 		if(SamePairGraphs(D1,D2) = true and IsIsomorphicBlockDesign(D1, D2) = false) then
 			return [D1, D2];
 		fi;
-		DMCShowProgressIndicator(numberScanned);
+		ShowProgressIndicator(numberScanned);
 	od;
 end);
 
@@ -386,7 +394,7 @@ BindGlobal("FindNonIsoDesignsWithIsoGraphUsingList", function( list )
 			return [D1, D2];
 		fi;
 
-		DMCShowProgressIndicator(numberScanned);
+		ShowProgressIndicator(numberScanned);
 		
 	od;
 	Print("\n\nFailed to find designs matching criteria.\n");

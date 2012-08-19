@@ -11,9 +11,11 @@
 # 
 ################################################################################
 
+SUDOKU_FOUND := [];
+
 BindGlobal("IsSudoku",function(B)
 	local testSet,i,j,k,blocks,k2;
-	blocks:=DMCListListMutableCopy(B.blocks);
+	blocks:=ListListMutableCopy(B.blocks);
 	if not B.k=[1,1,1] or not IsRat(Sqrt(B.v/3)) then
 		Print("The side length of a Sudoku grid must be a perfect square.");
 		return 0;
@@ -24,7 +26,7 @@ BindGlobal("IsSudoku",function(B)
 			testSet:=[];
 			for i in [1..Sqrt(B.v/3)] do
 				for k2 in [1..Sqrt(B.v/3)] do
-					Add(testSet, DMCGetBlocksContainingListWithBlockList(blocks, [i+(k-1)*Sqrt(B.v/3), B.v/3+k2+(j-1)*Sqrt(B.v/3)])[1][3]);
+					Add(testSet, GetBlocksContainingListWithBlockList(blocks, [i+(k-1)*Sqrt(B.v/3), B.v/3+k2+(j-1)*Sqrt(B.v/3)])[1][3]);
 				od;
 			od;
 			if not Size(Unique(testSet))=B.v/3 then
@@ -45,7 +47,7 @@ BindGlobal("ScanForSudoku",function(B)
 	fi;
 	
 	non_iso_found:=[];
-	DMC_SUDOKU_FOUND:=[];
+	SUDOKU_FOUND:=[];
 	i:=0;
 
 	Print("Iteration: ");
@@ -54,7 +56,7 @@ BindGlobal("ScanForSudoku",function(B)
 		i:=i+1;flag:=1;
 		if IsSudoku(B)=1 then
 			flag:=0;
-			for k in DMC_SUDOKU_FOUND do
+			for k in SUDOKU_FOUND do
 				if IsEqualBlockDesign(k, B) then
 					flag:=1; 
 					break;
@@ -63,7 +65,7 @@ BindGlobal("ScanForSudoku",function(B)
 			
 			if flag=0 then
 			
-				Add(DMC_SUDOKU_FOUND, B);
+				Add(SUDOKU_FOUND, B);
 				Add(non_iso_found, B);
 				non_iso_found:=BlockDesignIsomorphismClassRepresentatives(non_iso_found);
 				
@@ -71,16 +73,16 @@ BindGlobal("ScanForSudoku",function(B)
 			
 		fi;
 		
-		if not Size(Unique(DMC_SUDOKU_FOUND)) = Size(DMC_SUDOKU_FOUND) then
+		if not Size(Unique(SUDOKU_FOUND)) = Size(SUDOKU_FOUND) then
 			break;
 		fi;
 		
 		B:=OneStep(B);
 
-		DMCShowProgressIndicator(i);
+		ShowProgressIndicator(i);
 		
 		if flag=0 then
-			Print(": NonIso Found = ",Size(non_iso_found),",\t Total Found: ",Size(DMC_SUDOKU_FOUND),"\n");
+			Print(": NonIso Found = ",Size(non_iso_found),",\t Total Found: ",Size(SUDOKU_FOUND),"\n");
 		fi;
 	od;
 end);

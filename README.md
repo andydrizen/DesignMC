@@ -34,12 +34,79 @@ Alternatively, you can download the source to any/folder/you/like/DesignMC and t
 Quick Start
 -----------
 
+## Generating Generalised 2-designs
+
+### QuickLatinSquare
+
+### ProduceLatinSquare
+
+### ProduceLamdaFactorisation
+
+### ProduceTripleSystem
+
+### Make2Design
+
+### MakeLatinSquare
+
+### MakeImproperLatinSquare
+
+### MakeLambdaFactorisation
+
+### MakeImproperLambdaFactorisation
+
+### MakeTripleSystem
+
+### MakeImproperTripleSystem
+
+## Enumerating Generalised 2-designs
+
+### EnumerateLatinSquares
+
+### EnumerateImproperLatinSquares
+
+### EnumerateLambdaFactorisations
+
+### EnumerateImproperLambdaFactorisations
+
+### EnumerateTripleSystems
+
+### EnumerateImproperTripleSystems
+
+## Moving Around the Markov Chain
+
+### GeneratePivot
+
+### RemovableBlocks
+
+### Hopper
+
+### OneStep
+
+### ManyStepsProper
+
+### ManyStepsImproper
+
+### RandomWalkOnMarkovChain
+
+## Pair Graphs
+
+### CreatePairGraph
+
+### FindAlternatingTrail
+
+### FindAlternatingTrailWithoutGivenBlueEdge
+
+### FindAllAlternatingTrails
+
+### ComponentsOfGraph
+
+### IsChordedDG
 
 
 References
 ----------
 
-* [Generating uniformly distributed random latin squares](http://onlinelibrary.wiley.com/doi/10.1002/\(SICI\)1520-6610\(1996\)4:6%3C405::AID-JCD3%3E3.0.CO;2-J/abstract), Jacobson/Matthews 1998
-* [The DESIGN package for GAP](http://designtheory.org/software/gap_design/), Soicher, 2011
-* [The GRAPE package for GAP](http://www.maths.qmul.ac.uk/~leonard/grape/), Soicher, 2012
-* [Generating Uniformly Distributed Random 2-Designs with Block Size 3](http://onlinelibrary.wiley.com/doi/10.1002/jcd.21301/abstract), Drizen, 2012
+* [Generating uniformly distributed random latin squares](http://onlinelibrary.wiley.com/doi/10.1002/\(SICI\)1520-6610\(1996\)4:6%3C405::AID-JCD3%3E3.0.CO;2-J/abstract), M. Jacobson and P. Matthews, 1998
+* [The DESIGN package for GAP](http://designtheory.org/software/gap_design/), L. Soicher, 2011
+* [The GRAPE package for GAP](http://www.maths.qmul.ac.uk/~leonard/grape/), L. Soicher, 2012
+* [Generating Uniformly Distributed Random 2-Designs with Block Size 3](http://onlinelibrary.wiley.com/doi/10.1002/jcd.21301/abstract), A. Drizen, 2012

@@ -1,16 +1,17 @@
 ################################################################################
-# DesignMC/lib/DMCJSON.g					                        Andy L. Drizen
+# DesignMC/lib/JSON.g					                        Andy L. Drizen
 #                                                                   15/02/2011
 # File overview:
 # 
+# JSONStringifyListOfDesigns
 #
 ################################################################################
 
-BindGlobal("DMCJSONStringifyListOfDesigns", function( inputList, path )
+BindGlobal("JSONStringifyListOfDesigns", function( inputList, path )
 	local i,out,total_number,j,tmp,i2;
 	out:=OutputTextFile(path, false);
 	SetPrintFormattingStatus(out, false);
-	total_number:=DMCTotalNumberOfBlockDesigns(inputList);
+	total_number:=TotalNumberOfBlockDesigns(inputList);
 	PrintTo(out, 
 	"{\"t\":",inputList[1].tSubsetStructure.t,", \
 	\n\"vType\":",inputList[1].vType,", \

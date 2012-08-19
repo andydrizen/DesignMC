@@ -3,17 +3,34 @@
 #                                                                   15/02/2011
 # File overview:
 # 
-# A collection of wrappers for the DMC2DesignMake function (which in turn is a 
+# A collection of wrappers for the Make2Design function (which in turn is a 
 # wrapper of Soicher's BlockDesigns function.
 #
 # Also we have separate enumeration functions where the user can set the
 # isoLevel (NOTE: setting an isoLevel of 0 in EnumerateXX() is the same as 
-# XX() e.g. DMCEnumerateTripleSystems(7, 1, 0) = DMCTripleSystemMake(7, 1).
+# XX() e.g. EnumerateTripleSystems(7, 1, 0) = TripleSystemMake(7, 1).
 #
+# QuickLatinSquare
+# ProduceLatinSquare
+# ProduceLamdaFactorisation
+# ProduceTripleSystem
+# Make2Design
+# MakeLatinSquare
+# MakeImproperLatinSquare
+# MakeLambdaFactorisation
+# MakeImproperLambdaFactorisation
+# MakeTripleSystem
+# MakeImproperTripleSystem
+# EnumerateLatinSquares
+# EnumerateImproperLatinSquares
+# EnumerateLambdaFactorisations
+# EnumerateImproperLambdaFactorisations
+# EnumerateTripleSystems
+# EnumerateImproperTripleSystems
 #
 ################################################################################
 
-BindGlobal("DMCQuickLatinSquare",function(n)
+BindGlobal("QuickLatinSquare",function(n)
 	local D,blocks,l,d_blocks,i,j,k;
 	blocks:=[];
 	for i in [1..n] do
@@ -35,7 +52,7 @@ BindGlobal("DMCQuickLatinSquare",function(n)
 	return D;
 end);
 
-BindGlobal("DMCProduceLatinSquare",function(input)
+BindGlobal("ProduceLatinSquare",function(input)
 	#input is a rec. You should, at the very least, include these:
 	
 		# "v" (list): 	A tuple of positive integers, e.g. [2,4,6]. This means your square 
@@ -98,7 +115,7 @@ BindGlobal("DMCProduceLatinSquare",function(input)
 	blocksAvailable:=Cartesian([1..NrR],[NrR+1..NrR+NrC],[NrR+NrC+1..NrR+NrC+NrS]);
 	
 	Y:=Union(RC,RS,CS);	
-	L0:=DMCMultisetDifference(Combinations([1..NrS+NrR+NrC], 2), Y);	
+	L0:=MultisetDifference(Combinations([1..NrS+NrR+NrC], 2), Y);	
 
 	if imp=true then
 		pivot:=[1, NrR+1, NrR+NrC+1];
@@ -107,18 +124,18 @@ BindGlobal("DMCProduceLatinSquare",function(input)
 		Add(negatives, pivot);
 		
 		imp1:=lambdaVectorRCS[1]+1;
-		RC:=DMCMultisetDifference(RC, [[pivot[1], pivot[2]]]);
+		RC:=MultisetDifference(RC, [[pivot[1], pivot[2]]]);
 
 		imp2:=lambdaVectorRCS[2]+1;
-		RS:=DMCMultisetDifference(RS, [[pivot[1], pivot[3]]]);
+		RS:=MultisetDifference(RS, [[pivot[1], pivot[3]]]);
 	
 		imp3:=lambdaVectorRCS[3]+1;
-		CS:=DMCMultisetDifference(CS, [[pivot[2], pivot[3]]]);
+		CS:=MultisetDifference(CS, [[pivot[2], pivot[3]]]);
 
 		Y:=Union(RC,RS,CS);	
-		L0:=DMCMultisetDifference(L0, [[pivot[1], pivot[2]], [pivot[1], pivot[3]], [pivot[2], pivot[3]]]);
+		L0:=MultisetDifference(L0, [[pivot[1], pivot[2]], [pivot[1], pivot[3]], [pivot[2], pivot[3]]]);
 	fi;
-	blocksAvailable:=DMCDuplicateList(blocksAvailable, Maximum(lambdaVectorRCS+1));
+	blocksAvailable:=DuplicateList(blocksAvailable, Maximum(lambdaVectorRCS+1));
 		
 	if Size(Unique(lambdaVectorRCS)) = 1 then
 		partition:=[Y, L0];
@@ -218,7 +235,7 @@ BindGlobal("DMCProduceLatinSquare",function(input)
 	return results;
 end);
 
-BindGlobal("DMCProduceLamdaFactorisation",function(input)
+BindGlobal("ProduceLamdaFactorisation",function(input)
 
 	#input is a rec. You should, at the very least, include these:
 	
@@ -276,7 +293,7 @@ BindGlobal("DMCProduceLamdaFactorisation",function(input)
 
 	Y:=Union(RS,CS);	
 
-	L0:=DMCMultisetDifference(Combinations([1..NrR+NrC], 2), Y);	
+	L0:=MultisetDifference(Combinations([1..NrR+NrC], 2), Y);	
 
 	blocksAvailable:=Cartesian(RS,[NrR+1..NrR+NrC]);
 	for i2 in [1..Size(blocksAvailable)] do
@@ -289,16 +306,16 @@ BindGlobal("DMCProduceLamdaFactorisation",function(input)
 		blocksAvailable:=Difference(blocksAvailable, [pivot]);
 		
 		imp1:=lambdaVectorRCS[1]+1;
-		RS:=DMCMultisetDifference(RS, [[pivot[1], pivot[2]]]);
+		RS:=MultisetDifference(RS, [[pivot[1], pivot[2]]]);
 
 		imp2:=lambdaVectorRCS[2]+1;
-		CS:=DMCMultisetDifference(CS, [[pivot[1], pivot[3]]]);
-		CS:=DMCMultisetDifference(CS, [[pivot[2], pivot[3]]]);
+		CS:=MultisetDifference(CS, [[pivot[1], pivot[3]]]);
+		CS:=MultisetDifference(CS, [[pivot[2], pivot[3]]]);
 
 		Y:=Union(RS,CS);	
-		L0:=DMCMultisetDifference(L0, [[pivot[1], pivot[2]], [pivot[1], pivot[3]], [pivot[2], pivot[3]]]);
+		L0:=MultisetDifference(L0, [[pivot[1], pivot[2]], [pivot[1], pivot[3]], [pivot[2], pivot[3]]]);
 	fi;
-	blocksAvailable:=DMCDuplicateList(blocksAvailable, Maximum(lambdaVectorRCS)+1);
+	blocksAvailable:=DuplicateList(blocksAvailable, Maximum(lambdaVectorRCS)+1);
 	
 	if imp=true then
 		for i3 in [1..Int(Maximum(lambdaVectorRCS)/2)] do
@@ -385,7 +402,7 @@ BindGlobal("DMCProduceLamdaFactorisation",function(input)
 	return results;
 end);
 
-BindGlobal("DMCProduceTripleSystem",function(input)
+BindGlobal("ProduceTripleSystem",function(input)
 
 	#input is a rec. You should, at the very least, include these:
 	
@@ -440,9 +457,9 @@ BindGlobal("DMCProduceTripleSystem",function(input)
 		blocksAvailable:=Difference(blocksAvailable, [pivot]);
 		Add(negatives, pivot);
 		imp1:=lambdaVector[1]+1;
-		Ll:=DMCMultisetDifference(Ll, [[1,2],[1,3],[2,3]]);
+		Ll:=MultisetDifference(Ll, [[1,2],[1,3],[2,3]]);
 	fi;
-	blocksAvailable:=DMCDuplicateList(blocksAvailable, lambdaVector[1]+1);
+	blocksAvailable:=DuplicateList(blocksAvailable, lambdaVector[1]+1);
 
 	if imp=true then
 		for i3 in [1..Int(lambdaVector[1]/2)] do
@@ -498,24 +515,24 @@ BindGlobal("DMCProduceTripleSystem",function(input)
 end);
 
 
-BindGlobal("DMC2DesignMake",function(input)
+BindGlobal("Make2Design",function(input)
 	if input.k = [1,1,1] then
-		return DMCProduceLatinSquare(input);
+		return ProduceLatinSquare(input);
 	fi;
 	if input.k = [2,1] then
-		return DMCProduceLamdaFactorisation(input);
+		return ProduceLamdaFactorisation(input);
 	fi;
 	if input.k = [3] then
-		return DMCProduceTripleSystem(input);
+		return ProduceTripleSystem(input);
 	fi;
 end);
 
-BindGlobal("DMCLatinSquareMake",function(n,lambdaInt)
+BindGlobal("MakeLatinSquare",function(n,lambdaInt)
 	local results;
 	if lambdaInt = 1 then
-		results:=[DMCQuickLatinSquare(n)];
+		results:=[QuickLatinSquare(n)];
 	else
-		results:=DMC2DesignMake( rec(v:=[n,n,n], k:=[1,1,1], lambdas:=[lambdaInt,lambdaInt,lambdaInt]) );
+		results:=Make2Design( rec(v:=[n,n,n], k:=[1,1,1], lambdas:=[lambdaInt,lambdaInt,lambdaInt]) );
 	fi;
 	if Size(results)>0 then
 		return results[1];
@@ -524,9 +541,9 @@ BindGlobal("DMCLatinSquareMake",function(n,lambdaInt)
 	fi;
 end);
 
-BindGlobal("DMCImproperLatinSquareMake",function(n,lambdaInt)
+BindGlobal("MakeImproperLatinSquare",function(n,lambdaInt)
 	local results;
-	results:=DMC2DesignMake( rec(v:=[n,n,n], k:=[1,1,1], improper:=true, lambdas:=[lambdaInt,lambdaInt,lambdaInt]) );
+	results:=Make2Design( rec(v:=[n,n,n], k:=[1,1,1], improper:=true, lambdas:=[lambdaInt,lambdaInt,lambdaInt]) );
 	if Size(results)>0 then
 		return results[1];
 	else
@@ -534,9 +551,9 @@ BindGlobal("DMCImproperLatinSquareMake",function(n,lambdaInt)
 	fi;
 end);
 
-BindGlobal("DMCLambdaFactorisationMake",function(n,lambdaInt)
+BindGlobal("MakeLambdaFactorisation",function(n,lambdaInt)
 	local results;
-	results:=DMC2DesignMake( rec(v:=[n,n-1], k:=[2,1], lambdas:=[lambdaInt,lambdaInt]) );
+	results:=Make2Design( rec(v:=[n,n-1], k:=[2,1], lambdas:=[lambdaInt,lambdaInt]) );
 	if Size(results)>0 then
 		return results[1];
 	else
@@ -544,9 +561,9 @@ BindGlobal("DMCLambdaFactorisationMake",function(n,lambdaInt)
 	fi;
 end);
 
-BindGlobal("DMCImproperLambdaFactorisationMake",function(n,lambdaInt)
+BindGlobal("MakeImproperLambdaFactorisation",function(n,lambdaInt)
 	local results;
-	results:=DMC2DesignMake( rec(v:=[n,n-1], k:=[2,1],improper:=true,  lambdas:=[lambdaInt,lambdaInt]) );
+	results:=Make2Design( rec(v:=[n,n-1], k:=[2,1],improper:=true,  lambdas:=[lambdaInt,lambdaInt]) );
 	if Size(results)>0 then
 		return results[1];
 	else
@@ -554,9 +571,9 @@ BindGlobal("DMCImproperLambdaFactorisationMake",function(n,lambdaInt)
 	fi;
 end);
 
-BindGlobal("DMCTripleSystemMake",function(n,lambdaInt)
+BindGlobal("MakeTripleSystem",function(n,lambdaInt)
 	local results;
-	results:=DMC2DesignMake( rec(v:=[n], k:=[3], lambdas:=[lambdaInt]) );
+	results:=Make2Design( rec(v:=[n], k:=[3], lambdas:=[lambdaInt]) );
 	if Size(results)>0 then
 		return results[1];
 	else
@@ -564,9 +581,9 @@ BindGlobal("DMCTripleSystemMake",function(n,lambdaInt)
 	fi;
 end);
 
-BindGlobal("DMCImproperTripleSystemMake",function(n,lambdaInt)
+BindGlobal("MakeImproperTripleSystem",function(n,lambdaInt)
 	local results;
-	results:=DMC2DesignMake( rec(v:=[n], k:=[3],improper:=true, lambdas:=[lambdaInt]) );
+	results:=Make2Design( rec(v:=[n], k:=[3],improper:=true, lambdas:=[lambdaInt]) );
 	if Size(results)>0 then
 		return results[1];
 	else
@@ -578,26 +595,26 @@ end);
 # Enumeration functions (like above but with an isoLevel option).
 #
 
-BindGlobal("DMCEnumerateLatinSquares",function(n,lambdaInt, isoLevel)
-	return DMC2DesignMake( rec(v:=[n,n,n], k:=[1,1,1], lambdas:=[lambdaInt,lambdaInt,lambdaInt], isoLevel:=isoLevel) );
+BindGlobal("EnumerateLatinSquares",function(n,lambdaInt, isoLevel)
+	return Make2Design( rec(v:=[n,n,n], k:=[1,1,1], lambdas:=[lambdaInt,lambdaInt,lambdaInt], isoLevel:=isoLevel) );
 end);
 
-BindGlobal("DMCEnumerateImproperLatinSquares",function(n,lambdaInt,isoLevel)
-	return DMC2DesignMake( rec(v:=[n,n,n], k:=[1,1,1], improper:=true, lambdas:=[lambdaInt,lambdaInt,lambdaInt], isoLevel:=isoLevel) );
+BindGlobal("EnumerateImproperLatinSquares",function(n,lambdaInt,isoLevel)
+	return Make2Design( rec(v:=[n,n,n], k:=[1,1,1], improper:=true, lambdas:=[lambdaInt,lambdaInt,lambdaInt], isoLevel:=isoLevel) );
 end);
 
-BindGlobal("DMCEnumerateLambdaFactorisations",function(n,lambdaInt,isoLevel)
-	return DMC2DesignMake( rec(v:=[n,n-1], k:=[2,1], lambdas:=[lambdaInt,lambdaInt], isoLevel:=isoLevel) );
+BindGlobal("EnumerateLambdaFactorisations",function(n,lambdaInt,isoLevel)
+	return Make2Design( rec(v:=[n,n-1], k:=[2,1], lambdas:=[lambdaInt,lambdaInt], isoLevel:=isoLevel) );
 end);
 
-BindGlobal("DMCEnumerateImproperLambdaFactorisations",function(n,lambdaInt,isoLevel)
-	return DMC2DesignMake( rec(v:=[n,n-1], k:=[2,1],improper:=true,  lambdas:=[lambdaInt,lambdaInt], isoLevel:=isoLevel) );
+BindGlobal("EnumerateImproperLambdaFactorisations",function(n,lambdaInt,isoLevel)
+	return Make2Design( rec(v:=[n,n-1], k:=[2,1],improper:=true,  lambdas:=[lambdaInt,lambdaInt], isoLevel:=isoLevel) );
 end);
 
-BindGlobal("DMCEnumerateTripleSystems",function(n,lambdaInt,isoLevel)
-	return DMC2DesignMake( rec(v:=[n], k:=[3], lambdas:=[lambdaInt], isoLevel:=isoLevel) );
+BindGlobal("EnumerateTripleSystems",function(n,lambdaInt,isoLevel)
+	return Make2Design( rec(v:=[n], k:=[3], lambdas:=[lambdaInt], isoLevel:=isoLevel) );
 end);
 
-BindGlobal("DMCEnumerateImproperTripleSystems",function(n,lambdaInt,isoLevel)
-	return DMC2DesignMake( rec(v:=[n], k:=[3], improper:=true, lambdas:=[lambdaInt], isoLevel:=isoLevel) );
+BindGlobal("EnumerateImproperTripleSystems",function(n,lambdaInt,isoLevel)
+	return Make2Design( rec(v:=[n], k:=[3], improper:=true, lambdas:=[lambdaInt], isoLevel:=isoLevel) );
 end);
