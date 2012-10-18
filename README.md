@@ -1,7 +1,14 @@
 DesignMC
 ========
 
-A [GAP](http://www.gap-system.org) package for generating uniformly distributed random generalised 2-designs with block size 3.
+A [GAP](http://www.gap-system.org) package for generating uniformly distributed random generalised 2-designs with block size 3 with the following core features:
+
+* Interface with the [DESIGN Package](http://designtheory.org/software/gap_design/) to generate the proper and improper designs;
+* Implementation of Jacobson and Matthews' Markov chain for sampling the designs;
+* Mathematica integration for creating and analysing pair graphs;
+* Algorithms for finding alternating trails;
+
+There are also some extras included for the advanced user. These include exporting to different file types (JSON etc.) and testing various types of designs.
 
 Licence
 -------
@@ -37,7 +44,7 @@ Quick Start
 
 ### Generating Generalised 2-designs
 
-These functions are wrappers for Soicher's [DESIGN Package](http://designtheory.org/software/gap_design/). They handle the boiler plate code that is required to generate the particular designs in which we are interested.
+The DESIGN package is able to construct generalised t-designs, but due to its generality, the code required to do so is often cumbersome. As we are working strictly with squares, factorisations and triple systems of block size 3, the DesignMC package is able to considerably simplify the construction experience by abstracting the appropriate functions from the [DESIGN Package](http://designtheory.org/software/gap_design/).
 
 ---
 
